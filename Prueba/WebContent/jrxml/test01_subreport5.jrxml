@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="test01_subreport5" language="groovy" pageWidth="555" pageHeight="802" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="ef7f1a73-e54c-405f-86c5-35c2570cb5b1">
+	<property name="ireport.zoom" value="1.3310000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="operator" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\Jasper\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT a.type, count(*) total
+FROM SM.PROBSUMMARYM1 p,
+    "SM"."ACTIVITYM1" a
+WHERE p."NUMBER" = a."NUMBER"
+AND p.RESOLUTION_CODE != 'CANCELED'
+AND a.sysmoduser = $P{operator}
+AND (  to_char(from_tz(cast( a.datestamp as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(CURRENT_DATE-1, 'YYYY-MM-DD')||' 19:00:00'
+AND to_char(from_tz(cast(a.datestamp as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD HH24:MM:SS') )
+GROUP BY  a.type
+ORDER BY  count(*)]]>
+	</queryString>
+	<field name="TYPE" class="java.lang.String"/>
+	<field name="TOTAL" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="1" width="132" height="20" forecolor="#FFFFFF" backcolor="#003366" uuid="2b5f2e79-3722-476d-8538-7305d18e6253"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TYPE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="132" y="1" width="139" height="20" forecolor="#FFFFFF" backcolor="#003366" uuid="63e78f41-2462-436c-89cf-1d20bc38331e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement x="245" y="0" width="26" height="16" uuid="7e24dafd-e51c-4a03-8217-dfc83988fda3"/>
+				<box>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="">
+				<reportElement x="144" y="0" width="101" height="16" uuid="fe16108e-9ef1-46ea-9a52-8dd3f0971094"/>
+				<box>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="132" height="16" uuid="9ef1002d-3004-44a6-ba10-92d85bb60f8c"/>
+				<box>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TYPE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="1" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="271" height="1" uuid="4f46cdd5-2acd-472f-ad98-267a9731dd1e"/>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

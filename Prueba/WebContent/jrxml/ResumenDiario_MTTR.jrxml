@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ResumenDiario_MTTR" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="c02281ec-6de3-48e9-816d-9c6eb21df4ef">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="assignment" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select   ( SELECT MAX(ID) FROM SM.FROZEN_KPI ) ID
+        ,to_date(to_char(from_tz(cast(p.close_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY_MM'),'YYYY-MM') YEAR_MONTH
+        ,ROUND((AVG(TO_DATE(TO_CHAR(FROM_TZ(CAST(p.DOWNTIME_END AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') - TO_DATE(TO_CHAR(FROM_TZ(CAST(p.downtime_start AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS'))*24),2) AS "VALUE"
+
+from SM.PROBSUMMARYM1 p, SM.companym1 l, SM.PROBSUMMARYM2 p2
+
+WHERE p.COMPANY = l.company
+AND p."NUMBER" = p2."NUMBER"
+AND p.problem_status = 'Closed'
+AND p.resolution_code != 'CANCELED'
+AND p2.res_anal_code not like '%OUT OF WINDOW%'
+AND p2.res_anal_code not like '%NOT NOTIFIED%'
+AND p2.res_anal_code not like '%SCHEDULED%'
+AND p.resolution_code != 'SCHEDULED MAINTENANCE'
+AND p.resolution_code != 'REPLACED BY MASSIVE FAILURES'
+AND p.COMPANY != 'CNOC'
+AND p.assignment = $P{assignment}
+AND to_char(from_tz(cast(p.close_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') >= TO_CHAR(current_timestamp,'YYYY-MM')
+
+group by to_char(from_tz(cast(p.close_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY_MM')]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="YEAR_MONTH" class="java.sql.Timestamp"/>
+	<field name="VALUE" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="59" height="20" uuid="31011e5e-98c4-4697-8f78-31a21f2eabbd"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{VALUE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

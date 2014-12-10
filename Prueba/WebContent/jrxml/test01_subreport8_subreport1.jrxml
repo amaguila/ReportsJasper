@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="test01_subreport8_subreport1" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="47f97215-0711-477e-ac60-d23e69fabb2d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT
+i."NUMBER" AS IM
+,i."OPEN_TIME" AS DATES
+,i2.RES_ANAL_CODE AS RES_ANAL_CODE
+,UPPER(i.RESOLUTION_CODE) AS RESOLUTION_CODE
+,d.LOCATION AS LOCATION
+FROM  SM.probsummarym1 i, "SM"."DEVICE2M1" d,SM.probsummarym2 i2, SM.OPERATORM1 O
+WHERE
+		 i."NUMBER" = i2."NUMBER"
+      AND i2.AFFECTED_ITEM = d.LOGICAL_NAME
+      AND i.closed_by = o.full_name
+			AND i.RESOLUTION_CODE != 'CANCELED'
+			AND i.PROBLEM_STATUS = 'Closed'
+			-- AND TO_CHAR(i."OPEN_TIME" -6/24,'YYYY-MM') = '2014-06' --TO_CHAR(SYSDATE,'YYYY-MM')
+      AND o.name = 'rrosas'
+      AND TO_CHAR(from_tz(cast(i.OPEN_TIME as timestamp),'GMT0') at time zone 'America/Mexico_City','YYYY-MM-DD') >= TO_CHAR(CURRENT_DATE,'YYYY-MM-DD')
+      ORDER BY i."OPEN_TIME"]]>
+	</queryString>
+	<field name="IM" class="java.lang.String"/>
+	<field name="DATES" class="java.sql.Timestamp"/>
+	<field name="RES_ANAL_CODE" class="java.lang.String"/>
+	<field name="RESOLUTION_CODE" class="java.lang.String"/>
+	<field name="LOCATION" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement x="137" y="2" width="100" height="20" uuid="fdd10d9a-ec99-4bc9-98f8-1eac0f58524d"/>
+				<text><![CDATA[RES_ANAL_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="186" y="2" width="100" height="20" uuid="a3eda548-602b-4b90-9bb5-0d988d15fd95"/>
+				<text><![CDATA[RESOLUTION_CODE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<textField>
+				<reportElement x="137" y="4" width="100" height="20" uuid="f3477b7f-daa2-4e9f-b00e-5c5c55e55bf7"/>
+				<textFieldExpression><![CDATA[$F{RES_ANAL_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="186" y="56" width="100" height="20" uuid="1abc18a6-7750-4bfe-8e86-fb2b88e7acd8"/>
+				<textFieldExpression><![CDATA[$F{RESOLUTION_CODE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

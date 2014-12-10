@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteOperador_OpenIM8" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="73ba1639-2e12-4fed-b3a1-20aed6770710">
+	<property name="ireport.zoom" value="2.0490403660952117"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IM" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+i."NUMBER", i.problem_status,c.company,i.brief_description,TO_CHAR(FROM_TZ(CAST(i.open_time AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS') OPEN_TIME
+,
+CASE WHEN
+(
+( (TO_DATE(TO_CHAR(FROM_TZ(CAST(current_date AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') )
+ -
+ (TO_DATE(TO_CHAR(FROM_TZ(CAST(i.open_time AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS'))
+) )*24  >= TO_NUMBER ('8') THEN 'SI' ELSE 'NO' END open
+FROM "SM"."PROBSUMMARYM1" i,
+      SM.COMPANYM1 c
+WHERE  c.company = i.company
+  AND (i.RESOLUTION_CODE != 'CANCELED' OR i.RESOLUTION_CODE IS NULL)
+  AND i."NUMBER" = $P{IM}]]>
+	</queryString>
+	<field name="NUMBER" class="java.lang.String"/>
+	<field name="PROBLEM_STATUS" class="java.lang.String"/>
+	<field name="COMPANY" class="java.lang.String"/>
+	<field name="BRIEF_DESCRIPTION" class="java.lang.String"/>
+	<field name="OPEN_TIME" class="java.lang.String"/>
+	<field name="OPEN" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="35" height="12" uuid="3e66c427-4b0a-4a95-bf13-680cc67a2588"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OPEN}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

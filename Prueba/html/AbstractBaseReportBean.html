@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><head>
+<title></title>
+  <style type="text/css">
+    <!--code { font-family: Courier New, Courier; font-size: 10pt; margin: 0px; }-->
+  </style>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head><body>
+
+<div align="left" class="java">
+<table border="0" cellpadding="3" cellspacing="0" bgcolor="#ffffff">
+  <!-- start headline -->
+   <tr>
+    <td colspan="2">
+     <center><font size="+2">
+      <code><b>
+		AbstractBaseReportBean.java
+      </b></code>
+     </font></center>
+    </td>
+   </tr>
+  <!-- end headline -->
+   <tr>
+  <!-- start source code -->
+   <td nowrap="nowrap" valign="top" align="left">
+    <code>
+<font color="#7f0055"><b>package&nbsp;</b></font><font color="#000000">com.company.module.bean.common;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.io.File;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.io.IOException;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.util.HashMap;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.util.Map;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">javax.faces.context.ExternalContext;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">javax.faces.context.FacesContext;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">javax.servlet.ServletContext;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">javax.servlet.http.HttpServletRequest;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">javax.servlet.http.HttpServletResponse;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">net.sf.jasperreports.engine.JRDataSource;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">net.sf.jasperreports.engine.JRException;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">net.sf.jasperreports.engine.JasperPrint;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">net.sf.jasperreports.j2ee.servlets.BaseHttpServlet;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">com.company.module.util.ReportConfigUtil;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#7f0055"><b>public&nbsp;abstract&nbsp;class&nbsp;</b></font><font color="#000000">AbstractBaseReportBean&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;enum&nbsp;</b></font><font color="#000000">ExportOption&nbsp;</font><font color="#000000">{</font><font color="#000000">PDF,&nbsp;HTML,&nbsp;EXCEL,&nbsp;RTF</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;</b></font><font color="#000000">ExportOption&nbsp;exportOption;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;final&nbsp;</b></font><font color="#000000">String&nbsp;COMPILE_DIR&nbsp;=&nbsp;</font><font color="#2a00ff">&#34;/pages/report/design/&#34;</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#000000">AbstractBaseReportBean</font><font color="#000000">()&nbsp;{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>super</b></font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">setExportOption</font><font color="#000000">(</font><font color="#000000">ExportOption.PDF</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff"></font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>protected&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">prepareReport</font><font color="#000000">()&nbsp;</font><font color="#7f0055"><b>throws&nbsp;</b></font><font color="#000000">JRException,&nbsp;IOException&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">ExternalContext&nbsp;externalContext&nbsp;=&nbsp;FacesContext.getCurrentInstance</font><font color="#000000">()</font><font color="#000000">.getExternalContext</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">ServletContext&nbsp;context&nbsp;=&nbsp;</font><font color="#000000">(</font><font color="#000000">ServletContext</font><font color="#000000">)&nbsp;</font><font color="#000000">externalContext.getContext</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">HttpServletRequest&nbsp;request&nbsp;=&nbsp;</font><font color="#000000">(</font><font color="#000000">HttpServletRequest</font><font color="#000000">)&nbsp;</font><font color="#000000">externalContext.getRequest</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">HttpServletResponse&nbsp;response&nbsp;=&nbsp;</font><font color="#000000">(</font><font color="#000000">HttpServletResponse</font><font color="#000000">)&nbsp;</font><font color="#000000">externalContext.getResponse</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">ReportConfigUtil.compileReport</font><font color="#000000">(</font><font color="#000000">context,&nbsp;getCompileDir</font><font color="#000000">()</font><font color="#000000">,&nbsp;getCompileFileName</font><font color="#000000">())</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">File&nbsp;reportFile&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">File</font><font color="#000000">(</font><font color="#000000">ReportConfigUtil.getJasperFilePath</font><font color="#000000">(</font><font color="#000000">context,&nbsp;getCompileDir</font><font color="#000000">()</font><font color="#000000">,&nbsp;getCompileFileName</font><font color="#000000">()</font><font color="#000000">+</font><font color="#2a00ff">&#34;.jasper&#34;</font><font color="#000000">))</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">JasperPrint&nbsp;jasperPrint&nbsp;=&nbsp;ReportConfigUtil.fillReport</font><font color="#000000">(</font><font color="#000000">reportFile,&nbsp;getReportParameters</font><font color="#000000">()</font><font color="#000000">,&nbsp;getJRDataSource</font><font color="#000000">())</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if</b></font><font color="#000000">(</font><font color="#000000">getExportOption</font><font color="#000000">()</font><font color="#000000">.equals</font><font color="#000000">(</font><font color="#000000">ExportOption.HTML</font><font color="#000000">))&nbsp;{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">ReportConfigUtil.exportReportAsHtml</font><font color="#000000">(</font><font color="#000000">jasperPrint,&nbsp;response.getWriter</font><font color="#000000">())</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><font color="#7f0055"><b>else&nbsp;</b></font><font color="#000000">{&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">request.getSession</font><font color="#000000">()</font><font color="#000000">.setAttribute</font><font color="#000000">(</font><font color="#000000">BaseHttpServlet.DEFAULT_JASPER_PRINT_SESSION_ATTRIBUTE,&nbsp;jasperPrint</font><font color="#000000">)</font><font color="#000000">;&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">response.sendRedirect</font><font color="#000000">(</font><font color="#000000">request.getContextPath</font><font color="#000000">()</font><font color="#000000">+</font><font color="#2a00ff">&#34;/servlets/report/&#34;</font><font color="#000000">+getExportOption</font><font color="#000000">())</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">FacesContext.getCurrentInstance</font><font color="#000000">()</font><font color="#000000">.responseComplete</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff"></font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#000000">ExportOption&nbsp;getExportOption</font><font color="#000000">()&nbsp;{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">exportOption;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff"></font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">setExportOption</font><font color="#000000">(</font><font color="#000000">ExportOption&nbsp;exportOption</font><font color="#000000">)&nbsp;{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>this</b></font><font color="#000000">.exportOption&nbsp;=&nbsp;exportOption;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff"></font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>protected&nbsp;</b></font><font color="#000000">Map&lt;String,&nbsp;Object&gt;&nbsp;getReportParameters</font><font color="#000000">()&nbsp;{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;new&nbsp;</b></font><font color="#000000">HashMap&lt;String,&nbsp;Object&gt;</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff"></font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>protected&nbsp;</b></font><font color="#000000">String&nbsp;getCompileDir</font><font color="#000000">()&nbsp;{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">COMPILE_DIR;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>protected&nbsp;abstract&nbsp;</b></font><font color="#000000">JRDataSource&nbsp;getJRDataSource</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>protected&nbsp;abstract&nbsp;</b></font><font color="#000000">String&nbsp;getCompileFileName</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#000000">}</font></code>
+    
+   </td>
+  <!-- end source code -->
+   </tr>
+</table>
+</div>
+
+
+</body></html>

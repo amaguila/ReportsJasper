@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteKPIsSupervisores" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a8355ba7-4b5a-42d3-a6c9-362327642823">
+	<property name="ireport.zoom" value="1.4641000000000008"/>
+	<property name="ireport.x" value="111"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="assignment" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D://Jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+ 'DEL '||TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00' || ' AL '||
+        TO_CHAR(SYSDATE,'YYYY-MM-DD HH24:MM:SS')
+ AS FINAL_DATE, a.name sector , coordinator_incident username , o.full_name as supervisor
+FROM SM.assignmentm1 a, SM.operatorm1 o
+WHERE a.coordinator_incident = o.name
+AND a.name = $P{assignment}]]>
+	</queryString>
+	<field name="FINAL_DATE" class="java.lang.String"/>
+	<field name="SECTOR" class="java.lang.String"/>
+	<field name="USERNAME" class="java.lang.String"/>
+	<field name="SUPERVISOR" class="java.lang.String"/>
+	<variable name="titulo" class="java.lang.String">
+		<variableExpression><![CDATA["REPORTE  POR SUPERVISOR ".concat( $F{SECTOR} )]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="201" splitType="Stretch">
+			<image>
+				<reportElement x="680" y="1" width="116" height="63" uuid="0fc3fa06-108e-40c7-8368-b39a7778b8c5"/>
+				<imageExpression><![CDATA[$P{SUBREPORT_DIR} + "/CNOC.jpg"]]></imageExpression>
+			</image>
+			<image hAlign="Center" vAlign="Middle">
+				<reportElement x="0" y="1" width="106" height="61" uuid="5c418e8c-4d38-4575-b1ce-b8591e68403c"/>
+				<imageExpression><![CDATA[$P{SUBREPORT_DIR} + "/logoTelmex.jpg"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="272" y="145" width="107" height="18" uuid="cce6872d-3026-4b05-992c-67deb6bc3fe4"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Eficacia Diagnótico:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="272" y="83" width="269" height="20" forecolor="#FFFFFF" backcolor="#000066" uuid="8f0d7bf0-4083-4a82-8c21-5d5291affb7f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[INDICADORES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="272" y="125" width="107" height="18" uuid="86004451-3718-4fc8-b38f-64009c101157"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Eficiencia Diagnóstico:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="272" y="166" width="107" height="15" uuid="b3f582f5-5858-41ab-9685-38430d2e5da4"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Retroalimentación:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="540" y="125" width="128" height="18" uuid="374bfaf3-0343-4bbb-a5b2-adbb5cfe9e55"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Total de Incidentes Gestionados:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="110" y="103" width="161" height="18" uuid="aab5f020-848d-4c33-957f-c916a36a021a"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUPERVISOR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="540" y="103" width="128" height="18" uuid="6d98a1d5-0317-4347-aa02-7ee551dfd150"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Total de Incidentes Cerrados:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="121" width="107" height="18" uuid="890844de-752b-4ced-b572-7b39ce0f0b17"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Username:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="2" y="83" width="270" height="20" forecolor="#FFFFFF" backcolor="#000066" uuid="92d74684-f520-4433-8499-549561e777c1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DATOS SUPERVISOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="103" width="107" height="18" uuid="389f06b4-fe8f-494b-86e7-f33840539959"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Nombre Supervisor:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="272" y="103" width="107" height="18" uuid="69c7f650-11cd-4fd2-87b0-615fd07d81c0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Índice de Solución:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="541" y="83" width="260" height="20" forecolor="#FFFFFF" backcolor="#000066" uuid="4162aef8-4efa-422d-9f36-c990df35a61f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[MÉTRICAS]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="110" y="121" width="161" height="18" uuid="2b6aef11-dfe7-473c-a63d-0e5e8bfd94ff"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{USERNAME}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="684" y="103" width="117" height="18" uuid="751ad0de-502a-4f9e-982c-8287334fa4a8"/>
+				<subreportParameter name="sector">
+					<subreportParameterExpression><![CDATA[$F{SECTOR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/ReporteKPIsSupervisores_subreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="683" y="126" width="117" height="18" uuid="f1375d1e-e3c5-4351-9952-84a5c1c95265"/>
+				<subreportParameter name="sector">
+					<subreportParameterExpression><![CDATA[$F{SECTOR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/ReporteKPIsSupervisores_subreport2.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="2" y="139" width="107" height="18" uuid="42a6da1b-0ce4-4445-b15d-489a502d4f9d"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Sector:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="110" y="139" width="161" height="18" uuid="690b1ce4-cfb9-4928-b72c-b4d826b88851"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SECTOR}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="380" y="104" width="134" height="17" uuid="db008b79-e8cb-458b-bc98-c168ef0d8cd4"/>
+				<subreportParameter name="sector">
+					<subreportParameterExpression><![CDATA[$F{SECTOR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/ReporteKPIsSupervisores_subreport3.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="380" y="126" width="134" height="17" uuid="b0421b9a-bb8f-4060-8bc2-c93ba1155185"/>
+				<subreportParameter name="assignment">
+					<subreportParameterExpression><![CDATA[$F{SECTOR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/ReporteKPIsSupervisores_subreport4.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="380" y="146" width="134" height="17" uuid="e5418bb4-5a99-49ca-b634-1f5b009e0eb5"/>
+				<subreportParameter name="sector">
+					<subreportParameterExpression><![CDATA[$F{SECTOR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/ReporteKPIsSupervisores_subreport5.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="380" y="165" width="134" height="16" uuid="1c0837b9-0261-4883-92df-8dabbed3944c"/>
+				<subreportParameter name="sector">
+					<subreportParameterExpression><![CDATA[$F{SECTOR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/ReporteKPIsSupervisores_subreport9.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="219" y="1" width="389" height="26" forecolor="#0000CC" uuid="a100d855-2d14-41e5-9720-ba879aa5d13c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="15" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPORTE SUPERVISOR]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="219" y="27" width="389" height="25" forecolor="#0000CC" uuid="8bf6d2a9-5c04-454b-b923-5f05be66e2c6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="15" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SECTOR}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="272" y="185" width="107" height="15" uuid="bae19a4d-ea6c-467e-b377-0a660994d774"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Inicio de Atención:]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="380" y="186" width="134" height="15" uuid="00c5b73f-a49b-4945-a5d0-9d2979671c47"/>
+				<subreportParameter name="assignment">
+					<subreportParameterExpression><![CDATA[$F{SECTOR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} +"/ReporteKPIsSupervisores_InicioATNOP10.jasper"]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement x="551" y="64" width="250" height="19" uuid="de3dcaab-f6be-4d94-8b8a-6ff92a670300"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FINAL_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="2" y="0" width="235" height="20" forecolor="#FFFFFF" backcolor="#000066" uuid="656fe1ff-2faf-4b2c-842f-9678a7ee086d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[INCIDENTES CERRADOS DEL MES  > 24 Hrs]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="537" y="0" width="264" height="20" forecolor="#FFFFFF" backcolor="#000066" uuid="ab419827-0906-4712-9e9d-4414bae5e75a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[INCIDENTES DEL MES CON SEVERIDAD ALTA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="237" y="0" width="300" height="20" forecolor="#FFFFFF" backcolor="#000066" uuid="408dbce8-8594-448b-a6b2-c4087d8acac4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[INCIDENTES ABIERTOS > 24 Hrs ]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<subreport>
+				<reportElement x="2" y="0" width="235" height="11" uuid="c3d00232-e3e1-4ec6-af0a-2ef4684847b1"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="sector">
+					<subreportParameterExpression><![CDATA[$F{SECTOR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/ReporteKPIsSupervisores_subreport6.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="538" y="0" width="264" height="12" uuid="cad389a7-743c-4481-8c00-437ae2decd94"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="sector">
+					<subreportParameterExpression><![CDATA[$F{SECTOR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/ReporteKPIsSupervisores_subreport7.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="237" y="0" width="300" height="11" uuid="22e6e085-c593-4269-b5a0-b07174c1e6d6"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="sector">
+					<subreportParameterExpression><![CDATA[$F{SECTOR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/ReporteKPIsSupervisores_subreport8.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

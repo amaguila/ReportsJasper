@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteKPIsSupervisores_subreport8" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="f9705bb2-1fd4-46f3-a6ba-22e33a968bc0">
+	<property name="ireport.zoom" value="2.143588810000003"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="sector" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String">
+		<defaultValueExpression><![CDATA["D://Jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+i."NUMBER" AS IM,c.sector,i.problem_status,
+TO_CHAR(FROM_TZ(CAST(i.open_time AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS') open_time,
+(
+(TO_DATE(TO_CHAR(FROM_TZ(CAST(sysdate AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') )
+-
+(TO_DATE(TO_CHAR(FROM_TZ(CAST(i.open_time AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS'))
+)*24   AS SolvedIn72,
+ CASE
+            WHEN (i.SEVERITY = 1) THEN 'SI'
+            WHEN (i.SEVERITY = 2) THEN 'NO'
+            WHEN (i.SEVERITY = 3) THEN 'NO'
+            ELSE ' '
+            END "AFECTA_DISP",c.company
+
+FROM "SM"."PROBSUMMARYM1" i,
+                   SM.COMPANYM1 c
+WHERE  i.problem_status != 'Closed'
+                 AND c.company = i.company
+                 AND (i.RESOLUTION_CODE != 'CANCELED' OR i.RESOLUTION_CODE IS NULL)
+                 AND i.assignment = $P{sector}
+                AND
+                (
+(TO_DATE(TO_CHAR(FROM_TZ(CAST(sysdate AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') )
+-
+(TO_DATE(TO_CHAR(FROM_TZ(CAST(i.open_time AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS'))
+)*24 >= 24
+
+ORDER BY c.sector,c.company,(
+(TO_DATE(TO_CHAR(FROM_TZ(CAST( sysdate AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') )
+-
+(TO_DATE(TO_CHAR(FROM_TZ(CAST(i.open_time AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS'))
+)*24]]>
+	</queryString>
+	<field name="IM" class="java.lang.String"/>
+	<field name="SECTOR" class="java.lang.String"/>
+	<field name="PROBLEM_STATUS" class="java.lang.String"/>
+	<field name="OPEN_TIME" class="java.lang.String"/>
+	<field name="SOLVEDIN72" class="java.math.BigDecimal"/>
+	<field name="AFECTA_DISP" class="java.lang.String"/>
+	<field name="COMPANY" class="java.lang.String"/>
+	<group name="company">
+		<groupExpression><![CDATA[$F{COMPANY}]]></groupExpression>
+		<groupHeader>
+			<band height="12">
+				<textField>
+					<reportElement mode="Opaque" x="0" y="0" width="301" height="12" forecolor="#000000" backcolor="#CCCCCC" uuid="3e3dcb57-77d2-42d0-8b5b-bcc597acb39d"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="6" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{COMPANY}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="22" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="51" height="22" forecolor="#FFFFFF" backcolor="#003366" uuid="a45a6fc3-4022-48cb-8bb4-5a0ab5c63653"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[IM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="103" y="0" width="47" height="22" forecolor="#FFFFFF" backcolor="#003366" uuid="597352ae-4907-4f57-b926-87d1b55b9f10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Hrs.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="210" y="0" width="91" height="22" forecolor="#FFFFFF" backcolor="#003366" uuid="d45e5e6c-bd5c-4642-84ee-cb1b396e7a65"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Activities]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="51" y="0" width="52" height="22" forecolor="#FFFFFF" backcolor="#003366" uuid="a5609450-2b9f-4ce4-b100-47668dcefd82"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="150" y="0" width="25" height="22" forecolor="#FFFFFF" backcolor="#003366" uuid="1ca07672-323d-4327-8bca-713a07b3093a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Disp.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="175" y="0" width="35" height="22" forecolor="#FFFFFF" backcolor="#003366" uuid="9aa63da5-1f97-4d19-bbc2-9e29e690f7e0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Open Time]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="13" splitType="Stretch">
+			<textField pattern="###0.00">
+				<reportElement x="103" y="0" width="46" height="13" uuid="8e714181-1a52-438b-8f00-fe1968d0b048"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SOLVEDIN72}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="51" y="0" width="52" height="13" isPrintInFirstWholeBand="true" uuid="9e966c09-ef76-477b-ad79-5b74da26d96c"/>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PROBLEM_STATUS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="51" height="13" uuid="c90816fd-27bd-48e6-a55b-3dbe6b2dc525"/>
+				<box>
+					<leftPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{IM}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement stretchType="RelativeToBandHeight" x="210" y="0" width="91" height="13" uuid="44711609-de1f-4975-ba93-c402e2e5d29a"/>
+				<subreportParameter name="IM">
+					<subreportParameterExpression><![CDATA[$F{IM}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/ReporteKPIsSupervisores_subreport6_subreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement x="149" y="0" width="25" height="13" uuid="984a12c0-bd11-4130-ac8f-9cd3b0e700b5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AFECTA_DISP}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="174" y="0" width="36" height="13" uuid="f1703a52-33aa-4224-81ee-e4d780fbbfed"/>
+				<textElement verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OPEN_TIME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

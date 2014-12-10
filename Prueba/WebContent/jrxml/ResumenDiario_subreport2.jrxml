@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ResumenDiario_subreport2" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="96150b10-a536-44bd-a357-c7b72a019377">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="assignment" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+/*TO_CHAR(FROM_TZ(CAST(SYSDATE AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),
+TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS'), TO_CHAR (b.datestamp,'YYYY-MM-DD HH24:MI:SS')
+,
+(
+(current_Date)
+-
+b.datestamp
+)*24 */
+COUNT(*) AS TOTAL_ABIERTOS
+FROM
+(
+SELECT TO_DATE(TO_CHAR(MIN (A.DATESTAMP ) KEEP  (DENSE_RANK  FIRST ORDER BY A.DATESTAMP ),'YYYY-MM-DD HH24:mi'),'YYYY-MM-DD HH24:MI:SS') AS DATESTAMP
+FROM (
+  SELECT A."NUMBER" IM,
+  (TO_DATE(TO_CHAR(FROM_TZ(CAST(datestamp AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS'))
+  AS datestamp, TO_CHAR(SYSDATE,'YYYY-MM-DD HH24:MI:SS'),
+  TO_CHAR(
+  TO_DATE(TO_CHAR(FROM_TZ(CAST(datestamp AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS')
+  ,'YYYY-MM-DD HH24:MI:SS') AS DATEST,
+  (SYSDATE-(TO_DATE(TO_CHAR(FROM_TZ(CAST(datestamp AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS')))*24
+   FINAL
+    FROM SM.activitym1 a, SM.probsummarym1 i
+  WHERE  i."NUMBER" = a."NUMBER"
+  AND ( i.RESOLUTION_CODE != 'CANCELED' OR i.RESOLUTION_CODE IS NULL )
+  AND ( i.PROBLEM_STATUS <> 'Closed' AND i.PROBLEM_STATUS <> 'CLOSED')
+  AND   i.assignment = $P{assignment}
+  AND a.type = 'COMMUNICATION WITH CUSTOMER'
+ -- AND TO_CHAR(i.open_time, 'YYYY-MM') = TO_CHAR(SYSDATE, 'YYYY-MM')
+  ORDER BY A."NUMBER", datestamp DESC
+      ) a
+GROUP BY A.IM ) b
+WHERE
+(
+(SYSDATE)
+-
+b.datestamp
+)*24 >= 2]]>
+	</queryString>
+	<field name="TOTAL_ABIERTOS" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="100" height="20" uuid="17763b83-138f-45e0-8eb2-c6c42e25dc15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_ABIERTOS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

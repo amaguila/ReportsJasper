@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="test01_subreport3" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="ab21f1a2-f1d4-4a82-9d56-1dff8f25a8a4">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="operator" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String">
+		<defaultValueExpression><![CDATA["D://ReportesKPI's"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+	7000042 theid
+	,TO_DATE(TX.FECHA,'YYYY-MM') themonth
+	,d.dept_name COMPANY
+	,TX.TOT_SCAN T_INCI
+FROM SM.DEPTM1 d
+,
+(
+	SELECT
+      TO_CHAR(from_tz(cast(TUNO.DATES AS timestamp),'GMT0') AT TIME ZONE 'America/Mexico_City','YYYY-MM') AS FECHA
+		, TUNO.CODIGO_RED
+		,COUNT(*) AS TOT_SCAN
+	FROM
+	(
+			SELECT
+		  distinct   i."NUMBER" AS IM
+				,i."OPEN_TIME" AS DATES
+				,i2.RES_ANAL_CODE AS RES_ANAL_CODE
+				,i.RESOLUTION_CODE AS RESOLUTION_CODE
+				,d.LOCATION AS LOCATION
+				,d2.NETWORK_CODE AS CODIGO_RED,o.name
+FROM  SM.PROBSUMMARYM1 i, "SM"."DEVICE2M1" d,SM.PROBSUMMARYM2 i2, SM.DEVICE2M2 d2, SM.OPERATORM1 O,  "SM"."ACTIVITYM1" a
+WHERE
+              i."NUMBER" = i2."NUMBER"
+          AND i."NUMBER" =  a."NUMBER"
+          AND i.closed_by = o.full_name
+          AND i2.AFFECTED_ITEM = d.LOGICAL_NAME
+          AND d.logical_name = d2.logical_name
+          AND i.resolution_code != 'CANCELED'
+					AND (i2.RES_ANAL_CODE <> 'CANCELED')
+					AND i.PROBLEM_STATUS = 'Closed'
+					AND (d2.NETWORK_CODE != 'N000003')
+          AND o.name = $P{operator}
+        AND ( to_char(from_tz(cast(a.DATESTAMP as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+        AND to_char(from_tz(cast(a.DATESTAMP as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+				)TUNO
+	GROUP BY
+           TO_CHAR(from_tz(cast(TUNO.DATES AS TIMESTAMP),'GMT0') AT time ZONE 'America/Mexico_City','YYYY-MM'),TUNO.CODIGO_RED
+	ORDER BY TO_CHAR(from_tz(cast(TUNO.DATES as timestamp),'GMT0') at time zone 'America/Mexico_City','YYYY-MM')
+)TX
+WHERE d.NETWORK_CODE = TX.CODIGO_RED
+AND ROWNUM <=10]]>
+	</queryString>
+	<field name="THEID" class="java.math.BigDecimal"/>
+	<field name="THEMONTH" class="java.sql.Timestamp"/>
+	<field name="COMPANY" class="java.lang.String"/>
+	<field name="T_INCI" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="132" height="20" forecolor="#FFFFFF" backcolor="#003366" uuid="7373d3a9-35e1-42e8-b549-1a3eae949fed"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[COMPANY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="132" y="0" width="139" height="20" forecolor="#FFFFFF" backcolor="#003366" uuid="dab144db-fba3-4ff2-b2eb-76270d43981f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[INCIDENTES]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="132" height="20" uuid="32a70f07-6b6c-481c-85bc-675da2bd2e3f"/>
+				<box>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMPANY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="132" y="0" width="139" height="20" uuid="f25780e9-076d-4325-9d63-e881c5d10898"/>
+				<box>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{T_INCI}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="1" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="271" height="1" uuid="74420dd2-d7d7-49f1-9e79-357f8843eac3"/>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

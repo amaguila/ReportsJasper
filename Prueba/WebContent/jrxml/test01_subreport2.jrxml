@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="test01_subreport2" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="40c72ff0-dfb4-4250-bb0f-94546f6efee5">
+	<property name="ireport.zoom" value="1.9487171000000019"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String">
+		<defaultValueExpression><![CDATA["D://ReportesKPI's"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="assignment" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT * FROM (
+SELECT
+	ROWNUM theid
+	,TO_DATE(TX.FECHA,'YYYY-MM') YEAR_MONTH
+	,TX.OPER "OPERADORES"
+	,SUM(INC_MES_DIA) TOTAL_INCIDENTES
+FROM
+(
+	SELECT
+		TPD.FECHA
+		,TPD.OPER
+		,TPD.INC_MES_DIA
+	FROM
+	(
+		SELECT
+			TBASE.FECHA
+			,TBASE.OPER
+			,COUNT (*) AS INC_MES_DIA
+		FROM
+		(
+     SELECT
+         DISTINCT "SM"."ACTIVITYM1"."NUMBER"
+        , TO_CHAR(from_tz(cast("SM"."ACTIVITYM1"."DATESTAMP" as timestamp),'GMT') AT TIME ZONE 'America/Mexico_City','YYYY-MM') AS FECHA
+       	,"SM"."ACTIVITYM1".sysmoduser OPER
+    FROM "SM"."ACTIVITYM1",SM.PROBSUMMARYM1 p, SM.PROBSUMMARYM2 p2
+    WHERE
+        p."NUMBER" = p2."NUMBER"
+    AND  p."NUMBER" =  "SM"."ACTIVITYM1"."NUMBER"
+				--AND (p.RESOLUTION_CODE <> 'CANCELED' )
+    AND  "SM"."ACTIVITYM1"."TYPE" = 'Closed'
+    AND ( to_char(from_tz(cast("SM"."ACTIVITYM1"."DATESTAMP" as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+    AND to_char(from_tz(cast("SM"."ACTIVITYM1"."DATESTAMP" as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+    AND "SM"."ACTIVITYM1".OPERATOR NOT LIKE 'smnetcool%'
+    AND p.assignment = $P{assignment}
+
+	) TBASE
+	GROUP BY TBASE.FECHA, TBASE.OPER
+) TPD
+ORDER BY TPD.INC_MES_DIA DESC
+) TX
+WHERE  ROWNUM <=10
+GROUP BY ROWNUM, TX.FECHA, TX.OPER
+ORDER BY SUM(INC_MES_DIA) DESC
+) A ORDER BY A.theid]]>
+	</queryString>
+	<field name="THEID" class="java.math.BigDecimal"/>
+	<field name="YEAR_MONTH" class="java.sql.Timestamp"/>
+	<field name="OPERADORES" class="java.lang.String"/>
+	<field name="TOTAL_INCIDENTES" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="19" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="38" y="0" width="117" height="19" forecolor="#FFFFFF" backcolor="#003366" uuid="a5ed8c93-6fdc-4e5a-8878-188d7c0795c3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[OPERADORES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="155" y="0" width="117" height="19" forecolor="#FFFFFF" backcolor="#003366" uuid="ce739373-a8b4-46a6-8338-9085161a817e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL INCIDENTES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="38" height="19" forecolor="#FFFFFF" backcolor="#003366" uuid="0126c46a-5c35-4882-9f06-517067d4bd38"/>
+				<box>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NO]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement x="38" y="0" width="117" height="15" uuid="5ccf4e16-df58-45d8-ae9f-74bd5c8c88a7"/>
+				<box>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OPERADORES}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="155" y="0" width="117" height="15" uuid="1775f631-b84c-4458-9b26-71857a0b35a1"/>
+				<box>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_INCIDENTES}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="38" height="15" uuid="fe343304-917f-454f-a6da-37f93c84854b"/>
+				<box>
+					<leftPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="1" splitType="Stretch">
+			<line>
+				<reportElement x="1" y="0" width="271" height="1" uuid="e41cf5eb-4ecf-437f-b393-2c448912ab89"/>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

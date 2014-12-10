@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="test01_subreport4" language="groovy" pageWidth="555" pageHeight="802" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="46c6dafb-a3a8-436b-8e01-3eeb215cec09">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="operator" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+(SELECT MAX (ID) FROM SM.FROZEN_KPI) ID
+        ,TO_DATE(T.Mes,'YYYY-MM') YEAR_MONTH
+        ,T.Eficiencia_Diagnostico "EFICIENCIA"
+FROM
+(
+SELECT T_Total.Month as Mes,
+  ROUND(T_In15Min.No/T_Total.NoOpen * 100,2) as Eficiencia_Diagnostico
+FROM
+(
+SELECT to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') as Month,
+  COUNT(*) as NoOpen
+FROM SM.PROBSUMMARYM1 p, SM.companym1 l, SM.activitym1 ac, SM.PROBSUMMARYM2 p2, SM.operatorm1 o
+WHERE p.COMPANY = l.company
+AND p."NUMBER" = ac."NUMBER"
+AND p."NUMBER" = p2."NUMBER"
+AND ac.type = 'Diagnostic'
+AND p.resolution_code != 'SCHEDULED MAINTENANCE'
+AND p.resolution_code != 'REPLACED BY MASSIVE FAILURES'
+AND p2.res_anal_code not like '%OUT OF WINDOW%'
+AND p2.res_anal_code not like '%NOT NOTIFIED%'
+AND p2.res_anal_code not like '%SCHEDULED%'
+AND p.resolution_code != 'CANCELED'
+AND p.COMPANY != 'CNOC'
+AND ac.operator = o.full_name
+AND o.name =  $P{operator}
+AND ( to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+GROUP BY to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM')
+
+) T_Total
+,
+(
+SELECT T_Open.Month as Month , COUNT(*) as No
+FROM
+(
+SELECT to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') as Month,
+ac."NUMBER" as IM_OPEN,
+TO_DATE(TO_CHAR(FROM_TZ(CAST(ac.DATESTAMP AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') as DATESTAMP_OPEN
+from SM.PROBSUMMARYM1 p, SM.companym1 l, SM.activitym1 ac, SM.PROBSUMMARYM2 p2, SM.operatorm1 o
+WHERE p.COMPANY = l.company
+  AND p."NUMBER" = ac."NUMBER"
+  AND p."NUMBER" = p2."NUMBER"
+  AND p.resolution_code != 'SCHEDULED MAINTENANCE'
+  AND p.resolution_code != 'REPLACED BY MASSIVE FAILURES'
+  AND p2.res_anal_code not like '%OUT OF WINDOW%'
+  AND p2.res_anal_code not like '%NOT NOTIFIED%'
+  AND p2.res_anal_code not like '%SCHEDULED%'
+  AND ac.type = 'Diagnostic'
+  AND p.resolution_code != 'CANCELED'
+  AND p.COMPANY != 'CNOC'
+  AND ac.operator = o.full_name
+  AND o.name =  $P{operator}
+--AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') >= TO_CHAR(current_timestamp,'YYYY-MM')
+  AND ( to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+  AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+) T_Open
+,
+(
+SELECT T1.Month
+,IM_Change
+,DATESTAMP_Change
+--,MAX (T1.DATESTAMP_Change ) KEEP (DENSE_RANK FIRST ORDER BY T1.DATESTAMP_Change) AS DATESTAMP_Change
+FROM
+(
+SELECT to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') as Month,
+ac."NUMBER" as IM_Change,
+TO_DATE(TO_CHAR(FROM_TZ(CAST(ac.DATESTAMP AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') as DATESTAMP_Change
+, ac.operator
+from SM.PROBSUMMARYM1 p, SM.companym1 l, SM.activitym1 ac, SM.PROBSUMMARYM2 p2, SM.operatorm1 o
+WHERE p.COMPANY = l.company
+AND p."NUMBER" = ac."NUMBER"
+AND p."NUMBER" = p2."NUMBER"
+AND p.resolution_code != 'SCHEDULED MAINTENANCE'
+AND p.resolution_code != 'REPLACED BY MASSIVE FAILURES'
+AND p2.res_anal_code not like '%OUT OF WINDOW%'
+AND p2.res_anal_code not like '%NOT NOTIFIED%'
+AND p2.res_anal_code not like '%SCHEDULED%'
+AND ac.type = 'Diagnostic'
+AND p.resolution_code != 'CANCELED'
+AND p.COMPANY != 'CNOC'
+AND ac.operator = o.full_name
+AND o.name = $P{operator}
+  AND ( to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+  AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+) T1
+--GROUP BY T1.Month, IM_Change
+) T_Change
+WHERE T_Change.IM_Change=T_Open.IM_OPEN
+AND T_Change.Month = T_Open.Month
+AND (DATESTAMP_Change-DATESTAMP_OPEN)*24*60 <= 45
+GROUP BY T_Open.Month
+) T_In15Min
+WHERE T_In15Min.Month = T_Total.Month
+ORDER BY T_Total.Month
+)T]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="YEAR_MONTH" class="java.sql.Timestamp"/>
+	<field name="EFICIENCIA" class="java.math.BigDecimal"/>
+	<variable name="variable1" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="24" height="14" uuid="8a215d30-6178-4266-bc1e-2045205283b8"/>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $F{EFICIENCIA} == null     ? new BigDecimal('0')     : $F{EFICIENCIA} )]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

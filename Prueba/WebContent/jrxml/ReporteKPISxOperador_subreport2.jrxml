@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteKPISxOperador_subreport2" language="groovy" pageWidth="555" pageHeight="802" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="c2deedfe-6473-4f4e-bc95-e4e1ec71a738">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="operator" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT		T.RETROALIMENTACION RETROALIMENTACION
+FROM
+	(
+    SELECT
+    TONE.MES
+    ,ROUND(TTWO.TOT_CUMPLEN/TONE.TOT_UNI * 100,2) RETROALIMENTACION
+
+    FROM
+        (
+        select TO_CHAR(tabla.DT,'YYYY-MM') mes
+               ,count(TO_CHAR(tabla.DT,'YYYY-MM')) tot_uni
+
+        from
+            (
+            SELECT  p."NUMBER" as IM_Change,
+                    --TO_DATE(TO_CHAR(FROM_TZ(CAST(p.downtime_start AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS')as DT,
+                     TO_DATE(MIN (TO_CHAR(FROM_TZ(CAST(DATESTAMP AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS' )) KEEP (DENSE_RANK  FIRST ORDER BY TO_CHAR(FROM_TZ(CAST(DATESTAMP AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS' )),'YYYY-MM-DD HH24:MI:SS')as DT,
+                    p.RESOLUTION_CODE
+
+            FROM SM.PROBSUMMARYM1 p, SM.PROBSUMMARYM2 p2, SM.companym1 l, SM.activitym1 ac, SM.operatorm1 o
+
+            WHERE p.COMPANY = l.company
+            AND p."NUMBER" = p2. "NUMBER"
+            AND ac."NUMBER" = p."NUMBER"
+            AND ac.TYPE = 'Check List'
+            AND p.resolution_code != 'SCHEDULED MAINTENANCE'
+            AND p.resolution_code != 'REPLACED BY MASSIVE FAILURES'
+            AND p2.res_anal_code not like '%OUT OF WINDOW%'
+            AND p2.res_anal_code not like '%NOT NOTIFIED%'
+            AND p2.res_anal_code not like '%SCHEDULED%'
+            AND p.resolution_code != 'CANCELED'
+            AND p2. network_code != 'N000003'
+            --AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD') >= '2014-08-26' --to_char(current_timestamp, 'YYYY-MM')
+            AND p.closed_by = o.full_name
+            AND o.name =  $P{operator}
+            AND ( to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+             AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+            GROUP BY  p."NUMBER", p.RESOLUTION_CODE
+            )tabla
+            group by TO_CHAR(tabla.DT,'YYYY-MM')
+        )TONE
+        ,
+        (
+        SELECT
+        TO_CHAR(TCOUNT_CUMPLEN.MES,'YYYY-MM') MES
+        ,COUNT(*) TOT_CUMPLEN
+
+        FROM
+            (
+            SELECT  T_REG_UNICO_UNIVER.IM
+                    ,T_REG_UNICO_UNIVER.MES
+                    ,TO_CHAR(MIN (T_REG_UNICO_UNIVER.DATA_NOTA ) KEEP (DENSE_RANK  FIRST ORDER BY T_REG_UNICO_UNIVER.DATA_NOTA),'YYYY-MM-DD HH24:mi') AS DATA_NOTA
+            FROM
+                (
+                select tuno.IM as IM
+                       ,tuno.DT  as MES
+                       ,tdos.TYPEA
+                       ,tdos.FA DATA_NOTA
+                       ,(( tdos.FA ) - (tuno.DT ))*24*60 AS DIFTIME
+                from
+                    (
+                    SELECT  p."NUMBER" as IM,
+							TO_DATE(TO_CHAR(FROM_TZ(CAST(p.downtime_start AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS')as DT,
+							p.RESOLUTION_CODE
+
+                    FROM SM.PROBSUMMARYM1 p, SM.PROBSUMMARYM2 p2, SM.companym1 l, SM.operatorm1 o
+					WHERE p.COMPANY = l.company
+                    AND p."NUMBER" = p2. "NUMBER"
+					AND p.resolution_code != 'SCHEDULED MAINTENANCE'
+					AND p.resolution_code != 'REPLACED BY MASSIVE FAILURES'
+					AND p2.res_anal_code not like '%OUT OF WINDOW%'
+					AND p2.res_anal_code not like '%NOT NOTIFIED%'
+					AND p2.res_anal_code not like '%SCHEDULED%'
+					AND p.resolution_code != 'CANCELED'
+                    AND p2.network_code != 'N000003'
+                    AND p.closed_by = o.full_name
+                    AND o.name =  $P{operator}
+                   -- AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD') >= '2014-08-26' --to_char(current_timestamp, 'YYYY-MM')
+                    AND ( to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+                    AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+
+                    )tuno
+                    ,
+                    (
+                    SELECT DISTINCT tcom.IMA, tcom.TYPEA, tcom.FA
+					FROM (
+							SELECT tComm.IMA, tComm.TYPEA, tComm.FAC AS FA
+							FROM
+							(
+							SELECT "NUMBER" AS IMA,
+									TYPE AS TYPEA,
+									TO_DATE(TO_CHAR(FROM_TZ(CAST(DATESTAMP AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') as FAC
+                            FROM SM.activitym1
+                            WHERE TYPE = 'COMMUNICATION WITH CUSTOMER'
+							) tComm,
+							( SELECT "NUMBER" AS IMA,
+									TYPE AS TYPEA,
+									TO_DATE(TO_CHAR(FROM_TZ(CAST(DATESTAMP AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') as FAD
+                                FROM SM.activitym1
+								WHERE type = 'Diagnostic'
+							) tdiag
+							WHERE tComm.IMA = tdiag.IMA
+							AND  tComm.FAC > tdiag.FAD
+							AND tComm.IMA IN
+							(
+							SELECT A."NUMBER"
+							FROM SM.activitym1 A
+							WHERE A.TYPE = 'Check List'
+							)
+						)tcom
+						-- AND tCheckL.IMC = tdiag.IMA AND tdiag.IMA = tComm.IMA
+                    )tdos
+                    WHERE  tuno.IM = tdos.IMA
+                    AND  (( tdos.FA ) - (tuno.DT ))*24*60 < 60
+                )T_REG_UNICO_UNIVER
+                GROUP BY T_REG_UNICO_UNIVER.IM ,T_REG_UNICO_UNIVER.MES
+            )TCOUNT_CUMPLEN
+            GROUP BY TO_CHAR(TCOUNT_CUMPLEN.MES,'YYYY-MM')
+	)TTWO
+	WHERE TONE.MES=TTWO.MES
+	ORDER BY TONE.MES
+)T]]>
+	</queryString>
+	<field name="RETROALIMENTACION" class="java.math.BigDecimal"/>
+	<variable name="variable1" class="java.lang.String">
+		<variableExpression><![CDATA[( $F{RETROALIMENTACION} == null
+    ? new BigDecimal('0')
+    : $F{RETROALIMENTACION}
+)]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="1" width="24" height="14" uuid="188e3645-e203-4c8c-95ed-fb5dda004d26"/>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $F{RETROALIMENTACION} == null     ? new BigDecimal('0')     : $F{RETROALIMENTACION} )]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

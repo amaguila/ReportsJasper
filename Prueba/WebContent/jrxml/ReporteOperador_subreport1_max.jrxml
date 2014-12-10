@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteOperador_subreport1_max" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="f718f30a-c0f2-4aab-87a2-01d2b489ffe3">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="assignment" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT MAX(theid) MAX
+FROM
+(
+SELECT
+	ROWNUM theid
+	,TO_DATE(TX.FECHA,'YYYY-MM') YEAR_MONTH
+	,TX.OPER "OPERADORES"
+	,SUM(INC_MES_DIA) TOTAL_INCIDENTES,
+  TX.SECTOR
+FROM
+(
+	SELECT
+		TPD.FECHA
+		,TPD.OPER
+		,TPD.INC_MES_DIA
+    ,TPD.SECTOR
+	FROM
+	(
+		SELECT
+			TBASE.FECHA
+			,TBASE.OPER
+			,COUNT (*) AS INC_MES_DIA
+      ,TBASE.SECTOR
+		FROM
+		(
+     SELECT
+				DISTINCT "SM"."ACTIVITYM1"."NUMBER"
+        , TO_CHAR(from_tz(cast("SM"."ACTIVITYM1"."DATESTAMP" as timestamp),'GMT') AT TIME ZONE 'America/Mexico_City','YYYY-MM') AS FECHA
+				,"SM"."ACTIVITYM1".sysmoduser OPER
+        --,SUBSTR (TO_CHAR(FROM_TZ(CAST("SM"."ACTIVITYM1"."DATESTAMP" AS TIMESTAMP),'GMT0') AT TIME ZONE 'America/Mexico_City','day'),0,10) AS DIA,
+        ,p2.sector
+			FROM "SM"."ACTIVITYM1",SM.PROBSUMMARYM1 p, SM.PROBSUMMARYM2 p2
+			WHERE
+        p."NUMBER" = p2."NUMBER"
+				AND  p."NUMBER" =  "SM"."ACTIVITYM1"."NUMBER"
+				--AND (p.RESOLUTION_CODE <> 'CANCELED' )
+				AND  "SM"."ACTIVITYM1"."TYPE" = 'Closed'
+      AND ( to_char(from_tz(cast("SM"."ACTIVITYM1"."DATESTAMP" as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+        AND to_char(from_tz(cast("SM"."ACTIVITYM1"."DATESTAMP" as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+				AND "SM"."ACTIVITYM1".OPERATOR NOT LIKE 'smnetcool%'
+        AND p.assignment = $P{assignment}
+	) TBASE
+	GROUP BY TBASE.FECHA, TBASE.OPER, TBASE.SECTOR
+) TPD
+ORDER BY TPD.INC_MES_DIA DESC
+) TX
+GROUP BY ROWNUM, TX.FECHA, TX.OPER,TX.SECTOR
+ORDER BY ROWNUM) A --, SUM(INC_MES_DIA) DESC]]>
+	</queryString>
+	<field name="MAX" class="java.math.BigDecimal"/>
+	<variable name="max" class="java.lang.String">
+		<variableExpression><![CDATA[$F{MAX}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="27" height="20" forecolor="#000099" uuid="69d0d697-87d3-45c4-8fb2-961b3e1979c3"/>
+				<box>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{max}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

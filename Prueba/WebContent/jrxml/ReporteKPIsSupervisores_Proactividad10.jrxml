@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteKPIsSupervisores_Proactividad10" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="391353a2-a358-4f6e-9911-10b6688e7c54">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="assignment" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT TO_DATE(T_Proac.Month, 'YYYY-MM') themonth
+       ,Round((SCITO/Total)*100,2) thevalue
+FROM
+(
+SELECT to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') as Month,
+      COUNT(*) AS SCITO
+FROM SM.PROBSUMMARYM1 p, SM.PROBSUMMARYM2 p2, SM.companym1 l, SM.bizservicem1 b
+WHERE p.COMPANY = l.company
+AND p2.AFFECTED_ITEM = b.logical_name
+AND p."NUMBER" = p2."NUMBER"
+---------- FALTA EL CAMPO DETECTADO YA QUE NO SE ENCUENTRA EN EL SM 9.32
+AND p.opened_by = 'smnetcool'
+AND p.resolution_code != 'CANCELED'
+AND (b.SERVICE_SCOPE like 'M%M' OR b.SERVICE_SCOPE = 'MONITORING')
+--AND l.sector != 'INTERNATIONAL'
+AND p.assignment = $P{assignment}
+AND p.COMPANY != 'CNOC'
+AND ( to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+        AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+GROUP BY  to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM')
+)T_Proac
+,
+(
+SELECT to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') as Month,
+      COUNT(*) AS Total
+
+FROM SM.PROBSUMMARYM1 p, SM.PROBSUMMARYM2 p2, SM.companym1 l, SM.bizservicem1 b--SM.device2m2 d2, SM.device2m1 d, SM.bizservicem1 b
+WHERE p.COMPANY = l.company
+AND p2.AFFECTED_ITEM = b.logical_name
+AND p."NUMBER" = p2. "NUMBER"
+AND p.resolution_code != 'CANCELED'
+AND (b.SERVICE_SCOPE like 'M%M' OR b.SERVICE_SCOPE = 'MONITORING')
+--AND l.sector != 'INTERNATIONAL'
+AND p.assignment = $P{assignment}
+AND p.COMPANY != 'CNOC'
+AND ( to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+        AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+GROUP BY  to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM')
+)T_Total
+WHERE T_Proac.Month = T_Total.Month]]>
+	</queryString>
+	<field name="THEMONTH" class="java.sql.Timestamp"/>
+	<field name="THEVALUE" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="100" height="20" uuid="69222a7a-e180-4c2b-80ed-25b725f9a934"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{THEVALUE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

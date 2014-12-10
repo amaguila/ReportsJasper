@@ -1,0 +1,59 @@
+<html>
+<body>
+<form action="my_firsts_report.jsp" method="POST" target="_blank">
+ <table border="1" width="100%" class="col-lg-12">
+   <tr>
+   		<th>Reportes Supervisor</th>
+  		<th>Select</th>
+   </tr>
+   <tr>
+   		<td>Reporte KPIS Incidentes </td>
+   		<td><input type="radio" name="sp1" checked="checked" value="sp1" /> <br>
+   </td> 
+   </tr>    
+     <tr>
+   		<td>Resumen Operativo</td>
+   		<td><input type="radio" name="sp1"  value="sp2"/>   		  		
+    </td>
+   </tr> 
+    <tr>
+   		<td>Reporte Concentrado Operadores </td>
+   		<td><input type="radio" name="sp1" checked="checked"  value="sp3" />   		
+    </td>
+   </tr> 
+     <tr>
+   		<th>Reportes Operador</th>
+  		<th>Select</th>
+   </tr>
+   <tr>
+   		<td>Reporte KPIS Operador </td>
+   		<td><input type="radio" name="sp1"  value="sp11"><br>
+   		
+       </td>
+   </tr>
+  </table>                                                
+<input type="submit" value="Select Subject" onclick="#{myFirstJasperReportsBean.exportOption" />
+<script> 
+function ejecutaCodigo() 
+{ 
+    System.out.println("Hola");
+
+} 
+</script> 
+<!-- 
+<f:view>			
+<h:form id="form">
+			<h:selectOneRadio value = "#{myFirstJasperReportsBean.exportOption}">
+					<f:selectItem itemValue="PDF" itemLabel="PDF"/>
+				<f:selectItem itemValue="HTML" itemLabel="HTML"/>
+				<f:selectItem itemValue="EXCEL" itemLabel="EXCEL"/>
+				<f:selectItem itemValue="RTF" itemLabel="RTF"/>
+			</h:selectOneRadio>
+			<h:commandButton action="#{myFirstJasperReportsBean.execute}" value="Get Report" />      
+
+</h:form>
+</f:view>
+ -->
+</form>
+</body>
+</html>

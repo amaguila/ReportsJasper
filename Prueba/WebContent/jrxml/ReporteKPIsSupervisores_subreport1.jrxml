@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteKPIsSupervisores_subreport1" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="485897e0-c9b9-4265-8294-ab80ebe67ff2">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="sector" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+	COUNT (TBASE.DIA) AS TCERRADOS
+FROM
+(
+	SELECT
+		DISTINCT "SM"."ACTIVITYM1"."NUMBER"
+		  ,TO_CHAR(from_tz(cast("SM"."ACTIVITYM1"."DATESTAMP" as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') AS FECHA
+		,SUBSTR (TO_CHAR(from_tz(cast("SM"."ACTIVITYM1"."DATESTAMP" as timestamp),'GMT0') at time zone 'America/Mexico_City','day'),0,10) AS DIA
+	FROM "SM"."ACTIVITYM1",SM.PROBSUMMARYM1 p, "SM"."DEVICE2M1" d, SM.PROBSUMMARYM2 p2
+	WHERE p."NUMBER" = P2."NUMBER"
+        	AND p2.AFFECTED_ITEM = d.LOGICAL_NAME
+	AND p."NUMBER" =  "SM"."ACTIVITYM1"."NUMBER"
+	AND "SM"."ACTIVITYM1"."TYPE" = 'Closed'
+          AND p.assignment = $P{sector}
+	AND ( to_char(from_tz(cast("SM"."ACTIVITYM1"."DATESTAMP" as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+          AND to_char(from_tz(cast("SM"."ACTIVITYM1"."DATESTAMP" as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+
+    )TBASE]]>
+	</queryString>
+	<field name="TCERRADOS" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="50" height="15" uuid="31d8ee25-32eb-416c-b562-5548b48fd214"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $F{TCERRADOS} == null
+    ? new BigDecimal('0')
+    : $F{TCERRADOS} )]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteOperador_OpenResolved" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="6b615679-749b-4c27-8f4c-54355fae0140">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="IM" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+(ActRes.DR-( TO_DATE(TO_CHAR(FROM_TZ(CAST(p.open_time AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS')) ) * 24 AS DIFTIME
+FROM
+SM.PROBSUMMARYM1 p,
+  (
+   SELECT
+	   ac."NUMBER",( TO_DATE(MIN (TO_CHAR(FROM_TZ(CAST(AC.DATESTAMP AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS' )) KEEP (DENSE_RANK  LAST ORDER BY TO_CHAR(FROM_TZ(CAST(AC.DATESTAMP AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS' )),'YYYY-MM-DD HH24:MI:SS')) as DR
+
+    FROM  SM.activitym1 ac
+    WHERE ac.DESCRIPTION LIKE  '%RESOLVED%'
+      AND ac."NUMBER" = $P{IM}
+      GROUP BY ac."NUMBER"
+    ) ActRes
+WHERE p."NUMBER" = ActRes."NUMBER"
+    AND p."NUMBER" = $P{IM}]]>
+	</queryString>
+	<field name="DIFTIME" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField pattern="###0.00">
+				<reportElement x="0" y="0" width="35" height="12" uuid="2659d9aa-d8c8-4253-a4d7-1f8186adc5e0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DIFTIME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

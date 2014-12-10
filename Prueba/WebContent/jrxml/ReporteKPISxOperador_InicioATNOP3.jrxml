@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteKPISxOperador_InicioATNOP3" language="groovy" pageWidth="555" pageHeight="802" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="a98615c0-c9c3-4a84-9b41-f40db85c77ab">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="operator" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT id+rownum "ID", YEAR_MONTH,"VALUE", "CATEGORY" from (
+SELECT
+(SELECT MAX (ID) FROM SM.FROZEN_KPI) ID
+        ,TO_DATE(T.MES,'YYYY-MM') YEAR_MONTH
+        ,T.RETROALIMENTACION "VALUE"
+        ,'InicioAtencion1' AS "CATEGORY"
+
+FROM
+(
+	SELECT
+	TONE.MES
+	,ROUND(TTWO.TOT_CUMPLEN/TONE.TOT_UNI * 100,2) RETROALIMENTACION
+
+	FROM
+	(
+		select
+		TO_CHAR(tabla.DT,'YYYY-MM') mes
+		,count(TO_CHAR(tabla.DT,'YYYY-MM')) tot_uni
+
+		from
+		(
+SELECT  p."NUMBER" as IM_Change,
+			TO_DATE(TO_CHAR(FROM_TZ(CAST(p.downtime_start AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS')as DT,
+      TO_CHAR(MIN (DATESTAMP ) KEEP (DENSE_RANK  FIRST ORDER BY DATESTAMP),'YYYY-MM-DD HH24:mi') AS DATA_NOTA,
+			p.RESOLUTION_CODE
+
+FROM SM.PROBSUMMARYM1 p, SM.PROBSUMMARYM2 p2, SM.companym1 l, SM.activitym1 ac, SM.OPERATORM1 O
+WHERE p.COMPANY = l.company
+      AND p."NUMBER" = p2. "NUMBER"
+      AND p.resolution_code != 'SCHEDULED MAINTENANCE'
+      AND ac."NUMBER" = p."NUMBER"
+      AND p2.res_anal_code not like '%OUT OF WINDOW%'
+      AND p2.res_anal_code not like '%NOT NOTIFIED%'
+      AND p2.res_anal_code not like '%SCHEDULED%'
+      AND p.resolution_code != 'REPLACED BY MASSIVE FAILURES'
+      AND ac.TYPE = 'Check List'
+      AND p.resolution_code != 'CANCELED'
+      AND p2. network_code != 'N000003'
+      AND p.closed_by = o.full_name
+      AND o.name =  $P{operator}
+      AND ( to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+      AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+      GROUP BY  p."NUMBER",
+			TO_DATE(TO_CHAR(FROM_TZ(CAST(p.downtime_start AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS'),
+      	    p.RESOLUTION_CODE
+		)tabla
+		group by TO_CHAR(tabla.DT,'YYYY-MM')
+	)TONE
+	,
+	(
+		SELECT
+		TO_CHAR(TCOUNT_CUMPLEN.MES,'YYYY-MM') MES
+		,COUNT(*) TOT_CUMPLEN
+
+		FROM
+	(
+		SELECT
+			T_REG_UNICO_UNIVER.IM
+			,T_REG_UNICO_UNIVER.MES
+			,TO_CHAR(MIN (T_REG_UNICO_UNIVER.DATA_NOTA ) KEEP (DENSE_RANK  FIRST ORDER BY T_REG_UNICO_UNIVER.DATA_NOTA),'YYYY-MM-DD HH24:mi') AS DATA_NOTA
+		FROM
+		(
+			select
+				tuno.IM as IM
+				,tuno.DT  as MES
+				,tdos.TYPEA
+				,tdos.FA DATA_NOTA
+				,(( tdos.FA ) - (tuno.DT ))*24*60 AS DIFTIME
+			from
+			(
+				SELECT  p."NUMBER" as IM,
+						TO_DATE(TO_CHAR(FROM_TZ(CAST(p.downtime_start AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS')as DT,
+						p.RESOLUTION_CODE
+
+				FROM SM.PROBSUMMARYM1 p, SM.PROBSUMMARYM2 p2, SM.companym1 l,  SM.OPERATORM1 O
+
+				WHERE p.COMPANY = l.company
+				AND p."NUMBER" = p2. "NUMBER"
+				AND p.resolution_code != 'SCHEDULED MAINTENANCE'
+				AND p2.res_anal_code not like '%OUT OF WINDOW%'
+				AND p2.res_anal_code not like '%NOT NOTIFIED%'
+				AND p2.res_anal_code not like '%SCHEDULED%'
+				AND p.resolution_code != 'REPLACED BY MASSIVE FAILURES'
+				AND p.resolution_code != 'CANCELED'
+				AND p2.network_code != 'N000003'
+        AND p.closed_by = o.full_name
+        AND o.name =  $P{operator}
+        AND ( to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+        AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+	 		)tuno
+			,
+			(
+				SELECT "NUMBER" AS IMA,
+                TYPE AS TYPEA,
+                TO_DATE(TO_CHAR(FROM_TZ(CAST(DATESTAMP AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') as FA
+
+				FROM SM.activitym1
+				WHERE TYPE = 'Check List'
+
+			)tdos
+			WHERE 	tuno.IM = tdos.IMA
+			AND		(( tdos.FA ) - (tuno.DT ))*24*60 < 15
+		)T_REG_UNICO_UNIVER
+		GROUP BY T_REG_UNICO_UNIVER.IM	,T_REG_UNICO_UNIVER.MES
+	)TCOUNT_CUMPLEN
+	GROUP BY TO_CHAR(TCOUNT_CUMPLEN.MES,'YYYY-MM')
+)TTWO
+WHERE TONE.MES=TTWO.MES
+ORDER BY TONE.MES
+)T
+)]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="YEAR_MONTH" class="java.sql.Timestamp"/>
+	<field name="VALUE" class="java.math.BigDecimal"/>
+	<field name="CATEGORY" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="24" height="14" uuid="1caad0fd-6ff5-43c6-96d0-dbb9ad3f8b86"/>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $F{VALUE} == null
+    ? new BigDecimal('0')
+    : $F{VALUE} )]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

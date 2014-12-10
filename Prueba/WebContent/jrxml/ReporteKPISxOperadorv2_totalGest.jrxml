@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteKPISxOperadorv2_totalGest" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="d815ff6e-c031-4d0c-86cf-b6bd17e2e507">
+	<property name="ireport.zoom" value="1.9487171000000014"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="operator" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+ COUNT (TBASE.DIA) AS THEVALUE
+, TBASE.full_name, TBASE.name operator,  'DEL '||TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00' || ' AL '||
+        TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') AS FINAL_DATE
+FROM
+(
+SELECT
+DISTINCT A."NUMBER"
+,TO_CHAR(from_tz(cast(a.DATESTAMP as timestamp),'GMT0') at time zone 'America/Mexico_City','YYYY-MM') AS FECHA
+,SUBSTR (TO_CHAR(from_tz(cast(A."DATESTAMP" as timestamp),'GMT0') at time zone 'America/Mexico_City','day'),0,10) AS DIA,o.full_name, o.name,
+ 'DEL '||TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00' || ' AL '||
+        TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') AS FINAL_DATE
+FROM "SM"."ACTIVITYM1" A,SM.PROBSUMMARYM1 p, SM.PROBSUMMARYM2 p2, SM.OPERATORM1 O
+WHERE   p."NUMBER" = p2."NUMBER"
+    AND p."NUMBER" =  A."NUMBER"
+    AND a.sysmoduser = o.name
+    AND p.resolution_code != 'CANCELED'
+    AND o.name <> 'smnetcool' AND O.NAME <> 'sminternalwsdl'
+    AND ( to_char(from_tz(cast(a.DATESTAMP as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+        AND to_char(from_tz(cast(a.DATESTAMP as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+ AND A.sysmoduser = $P{operator}
+ORDER BY SUBSTR (TO_CHAR(from_tz(cast(A."DATESTAMP" as timestamp),'GMT0') at time zone 'America/Mexico_City','day'),0,10)
+
+)TBASE
+GROUP BY  tbase.full_name,TBASE.name]]>
+	</queryString>
+	<field name="THEVALUE" class="java.math.BigDecimal"/>
+	<field name="FULL_NAME" class="java.lang.String"/>
+	<field name="OPERATOR" class="java.lang.String"/>
+	<field name="FINAL_DATE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="15" height="14" uuid="cda23ba6-69a0-4d20-bc15-94743453763a"/>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{THEVALUE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

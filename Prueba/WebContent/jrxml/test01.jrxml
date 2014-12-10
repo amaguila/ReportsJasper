@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="test01" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a862ebd2-ca28-47b1-b8fe-9c4e393d6796">
+	<property name="ireport.zoom" value="1.2100000000000009"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="48"/>
+	<parameter name="operator" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+7000140 theid
+,TO_DATE(TPD.FECHA,'YYYY-MM') themonth
+,TPD.DIA thelevel
+,TPD.INC_MES_DIA thevalue,
+TPD.full_name
+FROM
+(
+SELECT
+TBASE.FECHA
+,TBASE.DIA
+,COUNT (TBASE.DIA) AS INC_MES_DIA
+, TBASE.full_name
+FROM
+(
+SELECT
+DISTINCT A."NUMBER"
+,TO_CHAR(from_tz(cast(a.DATESTAMP as timestamp),'GMT0') at time zone 'America/Mexico_City','YYYY-MM') AS FECHA
+,SUBSTR (TO_CHAR(from_tz(cast(A."DATESTAMP" as timestamp),'GMT0') at time zone 'America/Mexico_City','day'),0,10) AS DIA,o.full_name
+FROM "SM"."ACTIVITYM1" A,SM.PROBSUMMARYM1 p, SM.PROBSUMMARYM2 p2, SM.OPERATORM1 O
+WHERE   p."NUMBER" = p2."NUMBER"
+		AND p."NUMBER" =  A."NUMBER"
+    AND a.sysmoduser = o.name
+		--AND a.sysmoduser NOT LIKE 'smnetcool'
+		--AND TO_CHAR("SM"."ACTIVITYM1"."DATESTAMP" -6/24,'YYYY-MM') = '2014-06'--TO_CHAR(SYSDATE,'YYYY-MM')
+    AND TO_CHAR(from_tz(cast(a.DATESTAMP as timestamp),'GMT0') at time zone 'America/Mexico_City','YYYY-MM-DD') >= TO_CHAR( current_timestamp,  'YYYY-MM-DD')--TO_CHAR(sysdate-1,'YYYY-MM-DD')
+    AND a.sysmoduser = $P{operator}
+ORDER BY SUBSTR (TO_CHAR(from_tz(cast(A."DATESTAMP" as timestamp),'GMT0') at time zone 'America/Mexico_City','day'),0,10)
+
+)TBASE
+GROUP BY TBASE.FECHA,TBASE.DIA, tbase.full_name
+)TPD]]>
+	</queryString>
+	<field name="THEID" class="java.math.BigDecimal"/>
+	<field name="THEMONTH" class="java.sql.Timestamp"/>
+	<field name="THELEVEL" class="java.lang.String"/>
+	<field name="THEVALUE" class="java.math.BigDecimal"/>
+	<field name="FULL_NAME" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="84" splitType="Stretch">
+			<image hAlign="Center" vAlign="Middle">
+				<reportElement x="3" y="1" width="106" height="61" uuid="61262152-7298-4207-8d9d-d361710e16b5"/>
+				<imageExpression><![CDATA["D:\\ReportesKPI's\\logoTelmex.jpg"]]></imageExpression>
+			</image>
+			<image>
+				<reportElement x="438" y="1" width="116" height="63" uuid="e48c11d9-5953-4152-b677-69e7825a2941"/>
+				<imageExpression><![CDATA["D:\\ReportesKPI's\\CNOC.jpg"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="182" y="13" width="178" height="44" forecolor="#000099" uuid="d49b0692-3aa4-4272-aa86-4f9b818386d3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="15" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPORTE POR OPERADOR]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy HH.mm.ss">
+				<reportElement x="362" y="63" width="192" height="20" uuid="59dff37b-63ee-4b2c-a47f-e708ae3a2fd7"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="5" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="497" splitType="Stretch">
+			<subreport>
+				<reportElement x="1" y="400" width="270" height="97" uuid="55a6a792-e40f-410e-80ea-7f87b2b1aebb"/>
+				<subreportParameter name="operator">
+					<subreportParameterExpression><![CDATA[$P{operator}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["D:\\ReportesKPI's\\test01_subreport3.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement mode="Opaque" x="1" y="380" width="271" height="20" forecolor="#FFFFFF" backcolor="#000066" uuid="e141e4cc-a331-4974-a006-e4f213bfa801"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[INCIDENTES CERRADOS POR COMPAÑÍA]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="108" y="21" width="162" height="18" uuid="ecc42654-bc47-4418-ae34-747ab1c14533"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FULL_NAME}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="108" y="135" width="49" height="15" uuid="cf89edc4-3104-49aa-9e33-2de3f51d73ea"/>
+				<subreportParameter name="operator">
+					<subreportParameterExpression><![CDATA[$P{operator}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["D:\\ReportesKPI's\\test01_subreport6.jasper"]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement x="145" y="96" width="126" height="18" uuid="7e11359c-6c87-4ac6-84c8-83b5588379b7"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{THEVALUE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="150" y="151" width="26" height="15" uuid="41d02c1d-81ff-4c9b-951c-90c8e1d6e4c0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="108" y="150" width="49" height="15" uuid="e5d1ce96-0f7a-4591-83f5-d5dbc3d93908"/>
+				<subreportParameter name="operator">
+					<subreportParameterExpression><![CDATA[$P{operator}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["D:\\ReportesKPI's\\test01_subreport4.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="0" y="21" width="107" height="18" uuid="8ead9e47-ef62-4bbc-84ef-2bb32fa5fe96"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nombre Operador:]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="1" y="228" width="200" height="100" uuid="beb4cf56-fa72-4275-b2e7-f85cc1c00dc9"/>
+				<subreportParameter name="operator">
+					<subreportParameterExpression><![CDATA[$P{operator}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["D:\\ReportesKPI's\\test01_subreport7.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="150" y="137" width="26" height="15" uuid="1d5fccb8-94ce-40a0-9112-3304d8889be4"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="39" width="107" height="18" uuid="35dbad6a-d39a-4d0c-a0ae-02116a92a401"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Operador:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="57" width="270" height="20" forecolor="#FFFFFF" backcolor="#000066" uuid="94c8a689-8269-4745-8c73-ef75d961ffdd"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[METRICAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="1" width="270" height="20" forecolor="#FFFFFF" backcolor="#000066" uuid="4ac918a2-1dff-49ba-9c87-3190bf687ea0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DATOS OPERADOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="78" width="144" height="18" uuid="661f33e6-f074-46b1-ab78-5cfc37304c49"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total de Incidentes Cerrados:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="96" width="144" height="18" uuid="11a79d3a-a287-43b6-93d5-054c74379d42"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total de Incidentes Gestionados:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="135" width="107" height="15" uuid="fe882fde-2adf-4cc4-8079-e50fcf14437e"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[MTTR:]]></text>
+			</staticText>
+			<image hAlign="Center" vAlign="Middle">
+				<reportElement x="453" y="0" width="99" height="57" uuid="bcc3cf86-d780-48e2-90bc-445cee4140e1"/>
+				<imageExpression><![CDATA["D:\\ReportesKPI's\\Ranking.jpg"]]></imageExpression>
+			</image>
+			<subreport>
+				<reportElement x="145" y="78" width="126" height="18" uuid="505c6843-f220-4558-8cc5-446d20fec0ec"/>
+				<subreportParameter name="operator">
+					<subreportParameterExpression><![CDATA[$P{operator}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["D:\\ReportesKPI's\\test01_subreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="198" width="271" height="20" forecolor="#FFFFFF" backcolor="#000066" uuid="666d5440-2ab9-4fff-a37d-d7fbca496fd2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DISTRIBUCIÓN POR RESOLUCIÓN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="150" width="107" height="15" uuid="b13547ff-ea1e-491d-9da4-f65d28ecc48e"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Eficiencia Diagnótico:]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="282" y="226" width="271" height="100" uuid="a82fe692-584e-4d3d-b8c0-a6dc784a4840"/>
+				<subreportParameter name="operator">
+					<subreportParameterExpression><![CDATA[$P{operator}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["D:\\ReportesKPI's\\test01_subreport5.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement mode="Opaque" x="282" y="208" width="271" height="20" forecolor="#FFFFFF" backcolor="#000066" uuid="e1039c0e-283a-4092-9d70-98beb478ead5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[SLA POR CLIENTE]]></text>
+			</staticText>
+			<subreport>
+				<reportElement stretchType="RelativeToBandHeight" x="283" y="58" width="270" height="100" uuid="401866ad-6339-450a-9b78-62637d0166cd"/>
+				<subreportParameter name="operator">
+					<subreportParameterExpression><![CDATA[$P{operator}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["D:\\ReportesKPI's\\test01_subreport2.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="115" width="269" height="20" forecolor="#FFFFFF" backcolor="#000066" uuid="b201c9c0-c656-4512-bff2-d5163a9bac07"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[INDICADORES]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="108" y="39" width="162" height="18" uuid="8d193a57-54bc-4aff-acab-1d2f87682942"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{operator}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="283" y="0" width="170" height="56" forecolor="#FFFFFF" backcolor="#000066" uuid="51b28a72-a452-45b0-a244-302cba38dfcc"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[RANKING OPERADORES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="166" width="107" height="15" uuid="f1733854-17b0-4b98-8a63-a8991f05e3bc"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Eficacia Diagnótico:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="182" width="107" height="15" uuid="5d37c0ce-cb23-483f-ae47-32d11228f556"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Retroalimentación:]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="107" y="166" width="50" height="15" uuid="358d970f-231a-4596-a6d5-048fe8353c1d"/>
+				<subreportParameter name="operator">
+					<subreportParameterExpression><![CDATA[$P{operator}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["D:\\ReportesKPI's\\ReporteKPISxOperador_subreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="107" y="182" width="50" height="15" uuid="9b92063a-99de-4b75-ba25-5e356ab08f9b"/>
+				<subreportParameter name="operator">
+					<subreportParameterExpression><![CDATA[$P{operator}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["D:\\ReportesKPI's\\ReporteKPISxOperador_subreport2.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="150" y="166" width="26" height="15" uuid="31cf0582-ef36-491d-909d-18ee7d1b48c0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="150" y="180" width="26" height="15" uuid="fcc7697e-0671-4795-a4ca-211fe764dcf4"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

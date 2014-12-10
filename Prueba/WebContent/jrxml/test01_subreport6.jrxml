@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="test01_subreport6" language="groovy" pageWidth="555" pageHeight="802" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="70708188-4fa9-4b3d-806f-041d21a650ac">
+	<property name="ireport.zoom" value="1.4641000000000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="operator" class="java.lang.String"/>
+	<parameter name="periodo" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+	 ROUND(SolvedIn72/Total,4) *100  thevalue
+FROM
+	(
+		SELECT i.closed_by as COD_RED
+				,SUM ( CASE WHEN (
+								(TO_DATE(TO_CHAR(FROM_TZ(CAST(DOWNTIME_END AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') )
+								-
+								(TO_DATE(TO_CHAR(FROM_TZ(CAST(DOWNTIME_START AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS'))
+								)*24 <= 3.6 THEN  1 ELSE 0 END) AS SolvedIn72
+
+		FROM SM.PROBSUMMARYM1 i, SM.PROBSUMMARYM2 i2, SM.COMPANYM1 c, SM.OPERATORM1 O
+		WHERE i."NUMBER" = i2."NUMBER"
+ 		AND c.company = i.company
+    AND i.closed_by = o.full_name
+    AND (i.problem_status = 'Closed' OR i.problem_status = 'CLOSED' OR i.current_phase = 'Closure'  OR i.current_phase = 'CLOSURE')
+		AND (i.RESOLUTION_CODE != 'CANCELED')
+		AND (i2.NETWORK_CODE != 'N000003')
+  	AND o.name = $P{operator}
+		AND (
+           (i.resolution_code = 'TRANSMISSION' AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'TRANSMISSION' AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'TRANSMISSION' AND (i2.res_anal_code not like '%SCHEDULED%'))
+           OR (i.resolution_code = 'CUSTOMER'  AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'CUSTOMER'  AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'CUSTOMER'  AND (i2.res_anal_code not like '%SCHEDULED%'))
+			----------------------CNOC
+           OR (i.resolution_code = 'CPE' AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'CPE' AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'CPE' AND (i2.res_anal_code not like '%SCHEDULED%'))
+			---------------------BACKBONE
+           OR (i.resolution_code = 'BACKBONE' AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'BACKBONE' AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'BACKBONE' AND (i2.res_anal_code not like '%SCHEDULED%'))
+			)
+		 AND ( to_char(from_tz(cast(i.close_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+           AND to_char(from_tz(cast(i.close_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+  	GROUP BY  i.closed_by
+
+)tuno
+,
+(
+		SELECT i.closed_by as COD_RED
+				,COUNT(*) AS TOTAL
+		FROM SM.PROBSUMMARYM1 i, SM.PROBSUMMARYM2 i2, SM.COMPANYM1 c, SM.operatorm1 o
+		WHERE (i.problem_status = 'Closed' OR i.problem_status = 'CLOSED' OR i.current_phase = 'Closure'  OR i.current_phase = 'CLOSURE')
+		AND i."NUMBER" = i2."NUMBER"
+		AND c.company = i.company
+		AND i.closed_by = o.full_name
+		AND (i.RESOLUTION_CODE != 'CANCELED')
+		AND (i2.NETWORK_CODE != 'N000003')
+		AND (
+           (i.resolution_code = 'TRANSMISSION' AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'TRANSMISSION' AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'TRANSMISSION' AND (i2.res_anal_code not like '%SCHEDULED%'))
+           OR (i.resolution_code = 'CUSTOMER'  AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'CUSTOMER'  AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'CUSTOMER'  AND (i2.res_anal_code not like '%SCHEDULED%'))
+			----------------------CNOC
+           OR (i.resolution_code = 'CPE' AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'CPE' AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'CPE' AND (i2.res_anal_code not like '%SCHEDULED%'))
+			---------------------BACKBONE
+           OR (i.resolution_code = 'BACKBONE' AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'BACKBONE' AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'BACKBONE' AND (i2.res_anal_code not like '%SCHEDULED%'))
+			)
+   	 AND o.name = $P{operator}
+	 AND ( to_char(from_tz(cast(i.close_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+     AND to_char(from_tz(cast(i.close_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+  GROUP BY  i.closed_by
+
+)tdos
+where tuno.cod_red=tdos.cod_red]]>
+	</queryString>
+	<field name="THEVALUE" class="java.math.BigDecimal"/>
+	<variable name="variable1" class="java.lang.String">
+		<variableExpression><![CDATA[( $F{THEVALUE} == null ? 0 : $F{THEVALUE} )]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="0" width="24" height="14" uuid="be90e8cd-6572-428c-87ca-77a1fd195b43"/>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $F{THEVALUE} == null     ? new BigDecimal('0')     : $F{THEVALUE} )]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="1" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

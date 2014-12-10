@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteKPISxOperador_subreport1" language="groovy" pageWidth="555" pageHeight="802" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="974f8205-cc37-4b65-9aa3-f546a46fbacc">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="operator" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+tabla_dos.ef THEVALUE
+FROM
+(
+SELECT
+T_EfiDiag.Month
+, ROUND((T_EfiDiag.EfiDiag / T_Total.Total)*100,2) ef
+FROM
+(
+SELECT to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') as Month,
+  COUNT(*) AS EfiDiag
+FROM SM.PROBSUMMARYM1 p, SM.PROBSUMMARYM2 p2, SM.companym1 l,(  SELECT act.IM, act.name
+  FROM
+  (
+
+  SELECT p."NUMBER" IM ,to_char(from_tz(cast(a.datestamp as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS'),o.name
+    FROM SM.PROBSUMMARYM1 p, SM.ACTIVITYM1 a, SM.operatorm1 o
+  WHERE p."NUMBER" = a."NUMBER"
+    AND a.OPERATOR = o.full_name
+    AND a.TYPE ='Diagnostic'
+    AND o.name = $P{operator}
+    AND a.OPERATOR NOT IN ('TOOLS NETCOOL','TOOLS INTERNAL WSDL','CNOC DAPPS','smnetcool')
+    AND (
+        to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS') > TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+    AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS') <= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+  ORDER BY to_char(from_tz(cast(a.DATESTAMP as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS') ASC
+
+   ) act) actv
+WHERE p.COMPANY = l.company
+AND p."NUMBER" = p2."NUMBER"
+AND p."NUMBER" = actv.IM
+AND p.resolution_code != 'CANCELED'
+AND p2.network_code != 'N000003'
+AND p2.res_anal_code not like '%OUT OF WINDOW%'
+AND p2.res_anal_code not like '%NOT NOTIFIED%'
+AND p.resolution_code != 'SCHEDULED MAINTENANCE'
+AND p.resolution_code != 'REPLACED BY MASSIVE FAILURES'
+ AND ( to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+  AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+AND
+(
+(upper(SUBCATEGORY) || UPPER (RESOLUTION_CODE)) LIKE '%CUSTOMER%'||'CUSTOMER' OR
+(upper(SUBCATEGORY) || UPPER (RESOLUTION_CODE)) LIKE '%TRANSMISSION%'||'TRANSMISSION' OR
+(upper(SUBCATEGORY) || UPPER (RESOLUTION_CODE)) LIKE '%CPE%'||'CPE' OR
+(upper(SUBCATEGORY) || UPPER (RESOLUTION_CODE)) LIKE '%BACKBONE%'||'BACKBONE'
+)
+GROUP BY to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM')
+) T_EfiDiag
+,
+(
+SELECT to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') as Month,
+count(*) AS Total
+FROM SM.PROBSUMMARYM1 p, SM.PROBSUMMARYM2 p2, SM.companym1 l,
+(  SELECT act.IM, act.name
+  FROM
+  (
+
+  SELECT p."NUMBER" IM ,to_char(from_tz(cast(a.datestamp as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS'),o.name
+    FROM SM.PROBSUMMARYM1 p, SM.ACTIVITYM1 a, SM.operatorm1 o
+  WHERE p."NUMBER" = a."NUMBER"
+    AND a.OPERATOR = o.full_name
+    AND a.TYPE ='Diagnostic'
+    AND o.name = $P{operator}
+    AND a.OPERATOR NOT IN ('TOOLS NETCOOL','TOOLS INTERNAL WSDL','CNOC DAPPS','smnetcool')
+    AND (
+        to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS') > TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+    AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS') <= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+  ORDER BY to_char(from_tz(cast(a.DATESTAMP as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS') ASC
+
+   ) act) actv
+
+WHERE p.COMPANY = l.company
+AND p."NUMBER" = p2."NUMBER"
+AND p."NUMBER" = actv.IM
+AND p.resolution_code != 'CANCELED'
+AND p2.network_code != 'N000003'
+AND p.problem_status = 'Closed'
+AND p2.res_anal_code not like '%OUT OF WINDOW%'
+AND p2.res_anal_code not like '%NOT NOTIFIED%'
+AND p.resolution_code != 'SCHEDULED MAINTENANCE'
+AND p.resolution_code != 'REPLACED BY MASSIVE FAILURES'
+--AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') >= TO_CHAR(current_timestamp,'YYYY-MM') -->='2014-08-07'
+ AND ( to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+  AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+GROUP BY to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM')
+
+)T_Total
+WHERE T_EfiDiag.Month = T_Total.Month
+)tabla_dos]]>
+	</queryString>
+	<field name="THEVALUE" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="24" height="14" uuid="bdcc5b43-93f7-448e-96a8-7e6507660bb9"/>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $F{THEVALUE} == null
+    ? new BigDecimal('0')
+    : $F{THEVALUE} )]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

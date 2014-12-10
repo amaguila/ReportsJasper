@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteKPIsSupervisores_subreport2" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="3f4b8c23-369e-43de-9516-0c3ac3125b55">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="sector" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+COUNT (TBASE.DIA) AS THEVALUE
+FROM
+(
+SELECT
+DISTINCT A."NUMBER"
+,TO_CHAR(from_tz(cast(a.DATESTAMP as timestamp),'GMT0') at time zone 'America/Mexico_City','YYYY-MM') AS FECHA
+,SUBSTR (TO_CHAR(from_tz(cast(A."DATESTAMP" as timestamp),'GMT0') at time zone 'America/Mexico_City','day'),0,10) AS DIA
+FROM "SM"."ACTIVITYM1" A,SM.PROBSUMMARYM1 p, SM.PROBSUMMARYM2 p2, SM.OPERATORM1 O
+WHERE   p."NUMBER" = p2."NUMBER"
+   AND p."NUMBER" =  A."NUMBER"
+   AND a.sysmoduser = o.name
+   AND   (  to_char(from_tz(cast(a.DATESTAMP as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS') > TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+   AND to_char(from_tz(cast(a.DATESTAMP as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS') <= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+   AND p2.sector = $P{sector}
+ORDER BY SUBSTR (TO_CHAR(from_tz(cast(A."DATESTAMP" as timestamp),'GMT0') at time zone 'America/Mexico_City','day'),0,10)
+
+)TBASE]]>
+	</queryString>
+	<field name="THEVALUE" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="50" height="15" uuid="8ae0a0e6-1861-478f-9cfc-a31c86d9ef04"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $F{THEVALUE} == null
+    ? new BigDecimal('0')
+    : $F{THEVALUE} )]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

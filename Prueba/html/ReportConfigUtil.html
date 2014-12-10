@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><head>
+<title></title>
+  <style type="text/css">
+    <!--code { font-family: Courier New, Courier; font-size: 10pt; margin: 0px; }-->
+  </style>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head><body>
+
+<div align="left" class="java">
+<table border="0" cellpadding="3" cellspacing="0" bgcolor="#ffffff">
+  <!-- start headline -->
+   <tr>
+    <td colspan="2">
+     <center><font size="+2">
+      <code><b>
+ReportConfigUtil.java
+      </b></code>
+     </font></center>
+    </td>
+   </tr>
+  <!-- end headline -->
+   <tr>
+  <!-- start source code -->
+   <td nowrap="nowrap" valign="top" align="left">
+    <code>
+<font color="#7f0055"><b>package&nbsp;</b></font><font color="#000000">com.company.module.util;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.io.File;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.io.PrintWriter;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.util.Map;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">javax.servlet.ServletContext;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">net.sf.jasperreports.engine.JRAbstractExporter;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">net.sf.jasperreports.engine.JRDataSource;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">net.sf.jasperreports.engine.JRException;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">net.sf.jasperreports.engine.JRExporterParameter;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">net.sf.jasperreports.engine.JasperCompileManager;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">net.sf.jasperreports.engine.JasperFillManager;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">net.sf.jasperreports.engine.JasperPrint;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">net.sf.jasperreports.engine.export.JRHtmlExporter;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">net.sf.jasperreports.engine.export.JRHtmlExporterParameter;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#7f0055"><b>public&nbsp;class&nbsp;</b></font><font color="#000000">ReportConfigUtil&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f7f5f">/*</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">*&nbsp;PRIVATE&nbsp;METHODS</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">*/</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;static&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">setCompileTempDir</font><font color="#000000">(</font><font color="#000000">ServletContext&nbsp;context,&nbsp;String&nbsp;uri</font><font color="#000000">)&nbsp;{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">System.setProperty</font><font color="#000000">(</font><font color="#2a00ff">&#34;jasper.reports.compile.temp&#34;</font><font color="#000000">,&nbsp;context.getRealPath</font><font color="#000000">(</font><font color="#000000">uri</font><font color="#000000">))</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f7f5f">/*</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">*&nbsp;PUBLIC&nbsp;METHODS</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">*/</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;static&nbsp;</b></font><font color="#7f0055"><b>boolean&nbsp;</b></font><font color="#000000">compileReport</font><font color="#000000">(</font><font color="#000000">ServletContext&nbsp;context,&nbsp;String&nbsp;compileDir,&nbsp;String&nbsp;filename</font><font color="#000000">)&nbsp;</font><font color="#7f0055"><b>throws&nbsp;</b></font><font color="#000000">JRException&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">String&nbsp;jasperFileName&nbsp;=&nbsp;context.getRealPath</font><font color="#000000">(</font><font color="#000000">compileDir&nbsp;+&nbsp;filename&nbsp;+</font><font color="#2a00ff">&#34;.jasper&#34;</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">File&nbsp;jasperFile&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">File</font><font color="#000000">(</font><font color="#000000">jasperFileName</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if</b></font><font color="#000000">(</font><font color="#000000">jasperFile.exists</font><font color="#000000">())&nbsp;{&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;true</b></font><font color="#000000">;&nbsp;</font><font color="#3f7f5f">//&nbsp;jasper&nbsp;file&nbsp;already&nbsp;exists,&nbsp;do&nbsp;not&nbsp;compile&nbsp;again</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>try&nbsp;</b></font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//&nbsp;jasper&nbsp;file&nbsp;has&nbsp;not&nbsp;been&nbsp;constructed&nbsp;yet,&nbsp;so&nbsp;compile&nbsp;the&nbsp;xml&nbsp;file</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">setCompileTempDir</font><font color="#000000">(</font><font color="#000000">context,&nbsp;compileDir</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">String&nbsp;xmlFileName&nbsp;=&nbsp;jasperFileName.substring</font><font color="#000000">(</font><font color="#990000">0</font><font color="#000000">,&nbsp;jasperFileName.indexOf</font><font color="#000000">(</font><font color="#2a00ff">&#34;.jasper&#34;</font><font color="#000000">))</font><font color="#000000">+</font><font color="#2a00ff">&#34;.jrxml&#34;</font><font color="#000000">;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">JasperCompileManager.compileReportToFile</font><font color="#000000">(</font><font color="#000000">xmlFileName</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;true</b></font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><font color="#7f0055"><b>catch</b></font><font color="#000000">(</font><font color="#000000">Exception&nbsp;e</font><font color="#000000">)&nbsp;{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">e.printStackTrace</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;false</b></font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;static&nbsp;</b></font><font color="#000000">JasperPrint&nbsp;fillReport</font><font color="#000000">(</font><font color="#000000">File&nbsp;reportFile,&nbsp;Map&lt;String,&nbsp;Object&gt;&nbsp;parameters,&nbsp;JRDataSource&nbsp;jrDataSource</font><font color="#000000">)&nbsp;</font><font color="#7f0055"><b>throws&nbsp;</b></font><font color="#000000">JRException&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">parameters.put</font><font color="#000000">(</font><font color="#2a00ff">&#34;BaseDir&#34;</font><font color="#000000">,&nbsp;reportFile.getParentFile</font><font color="#000000">())</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">JasperPrint&nbsp;jasperPrint&nbsp;=&nbsp;&nbsp;JasperFillManager.fillReport</font><font color="#000000">(</font><font color="#000000">reportFile.getPath</font><font color="#000000">()</font><font color="#000000">,&nbsp;parameters,&nbsp;jrDataSource</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">jasperPrint;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;static&nbsp;</b></font><font color="#000000">String&nbsp;getJasperFilePath</font><font color="#000000">(</font><font color="#000000">ServletContext&nbsp;context,&nbsp;String&nbsp;compileDir,&nbsp;String&nbsp;jasperFile</font><font color="#000000">)&nbsp;{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">context.getRealPath</font><font color="#000000">(</font><font color="#000000">compileDir&nbsp;+&nbsp;jasperFile</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;static&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">exportReport</font><font color="#000000">(</font><font color="#000000">JRAbstractExporter&nbsp;exporter,&nbsp;JasperPrint&nbsp;jasperPrint,&nbsp;PrintWriter&nbsp;out</font><font color="#000000">)&nbsp;</font><font color="#7f0055"><b>throws&nbsp;</b></font><font color="#000000">JRException&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">exporter.setParameter</font><font color="#000000">(</font><font color="#000000">JRExporterParameter.JASPER_PRINT,&nbsp;jasperPrint</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">exporter.setParameter</font><font color="#000000">(</font><font color="#000000">JRExporterParameter.OUTPUT_WRITER,&nbsp;out</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">exporter.exportReport</font><font color="#000000">()</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff"></font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;static&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">exportReportAsHtml</font><font color="#000000">(</font><font color="#000000">JasperPrint&nbsp;jasperPrint,&nbsp;PrintWriter&nbsp;out</font><font color="#000000">)&nbsp;</font><font color="#7f0055"><b>throws&nbsp;</b></font><font color="#000000">JRException&nbsp;</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">JRHtmlExporter&nbsp;exporter&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">JRHtmlExporter</font><font color="#000000">()</font><font color="#000000">;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">exporter.setParameter</font><font color="#000000">(</font><font color="#000000">JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN,&nbsp;Boolean.FALSE</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">exporter.setParameter</font><font color="#000000">(</font><font color="#000000">JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS,&nbsp;Boolean.TRUE</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">exporter.setParameter</font><font color="#000000">(</font><font color="#000000">JRHtmlExporterParameter.CHARACTER_ENCODING,&nbsp;</font><font color="#2a00ff">&#34;ISO-8859-9&#34;</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">exportReport</font><font color="#000000">(</font><font color="#000000">exporter,&nbsp;jasperPrint,&nbsp;out</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#000000">}</font></code>
+    
+   </td>
+  <!-- end source code -->
+   </tr>
+</table>
+</div>
+<!-- =       END of automatically generated HTML code       = -->
+<!-- ======================================================== -->
+
+
+</body></html>

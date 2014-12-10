@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ResumenDiario_IndiceSolucion4h" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="74ee879a-3a72-4246-bf59-05bc51c16c8b">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="assignment" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+	7000112 theid
+	,TO_DATE(tuno.mesuno,'YYYY-MM') themonth
+	,tuno.assignment thelevel
+	,ROUND(SolvedIn72/Total,4) *100 thevalue
+FROM
+	(
+		SELECT to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') as MESUNO
+				,SUM ( CASE WHEN (
+								(TO_DATE(TO_CHAR(FROM_TZ(CAST(DOWNTIME_END AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') )
+								-
+								(TO_DATE(TO_CHAR(FROM_TZ(CAST(DOWNTIME_START AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS'))
+								)*24 <= 4 THEN  1 ELSE 0 END) AS SolvedIn72, i.assignment
+		FROM SM.PROBSUMMARYM1 i, SM.PROBSUMMARYM2 i2, SM.COMPANYM1 c, SM.OPERATORM1 O
+
+		WHERE i.problem_status = 'Closed'
+		AND i."NUMBER" = i2."NUMBER"
+		AND c.company = i.company
+		AND (i.RESOLUTION_CODE != 'CANCELED')
+		AND (i2.NETWORK_CODE != 'N000003')
+    AND i.closed_by = o.full_name
+    AND i.assignment = $P{assignment}
+   	AND (
+           (i.resolution_code = 'TRANSMISSION' AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'TRANSMISSION' AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'TRANSMISSION' AND (i2.res_anal_code not like '%SCHEDULED%'))
+           OR (i.resolution_code = 'CUSTOMER'  AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'CUSTOMER'  AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'CUSTOMER'  AND (i2.res_anal_code not like '%SCHEDULED%'))
+			----------------------CNOC
+           OR (i.resolution_code = 'CPE' AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'CPE' AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'CPE' AND (i2.res_anal_code not like '%SCHEDULED%'))
+			---------------------BACKBONE
+           OR (i.resolution_code = 'BACKBONE' AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'BACKBONE' AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'BACKBONE' AND (i2.res_anal_code not like '%SCHEDULED%'))
+			)
+      AND to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') >= TO_CHAR(SYSDATE, 'YYYY-MM')
+
+    /*  AND (  to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+           AND to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+   */GROUP BY to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') , i.assignment
+
+)tuno
+,
+(
+		SELECT to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') as MESDOS
+				,COUNT(*) AS TOTAL
+        ,i.assignment
+		FROM SM.PROBSUMMARYM1 i, SM.PROBSUMMARYM2 i2, SM.COMPANYM1 c
+
+		WHERE i.problem_status = 'Closed'
+		AND i."NUMBER" = i2."NUMBER"
+		AND c.company = i.company
+		AND (i.RESOLUTION_CODE != 'CANCELED')
+		AND (i2.NETWORK_CODE != 'N000003')
+    AND i.assignment  = $P{assignment}
+		AND (
+           (i.resolution_code = 'TRANSMISSION' AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'TRANSMISSION' AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'TRANSMISSION' AND (i2.res_anal_code not like '%SCHEDULED%'))
+           OR (i.resolution_code = 'CUSTOMER'  AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'CUSTOMER'  AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'CUSTOMER'  AND (i2.res_anal_code not like '%SCHEDULED%'))
+			----------------------CNOC
+           OR (i.resolution_code = 'CPE' AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'CPE' AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'CPE' AND (i2.res_anal_code not like '%SCHEDULED%'))
+			---------------------BACKBONE
+           OR (i.resolution_code = 'BACKBONE' AND (i2.res_anal_code not like '%OUT OF WINDOW%'))
+           OR (i.resolution_code = 'BACKBONE' AND (i2.res_anal_code not like '%NOT NOTIFIED%'))
+           OR (i.resolution_code = 'BACKBONE' AND (i2.res_anal_code not like '%SCHEDULED%'))
+			)
+      AND to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM') >= TO_CHAR(SYSDATE, 'YYYY-MM')
+	/*	AND   (  to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS') > TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+       AND to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS') <= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+   */    GROUP BY to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM')  ,i.assignment
+
+)tdos
+WHERE tuno.mesuno = tdos.mesdos
+AND tuno.assignment=tdos.assignment]]>
+	</queryString>
+	<field name="THEID" class="java.math.BigDecimal"/>
+	<field name="THEMONTH" class="java.sql.Timestamp"/>
+	<field name="THELEVEL" class="java.lang.String"/>
+	<field name="THEVALUE" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField pattern="">
+				<reportElement x="0" y="0" width="49" height="20" uuid="d1590c87-5bc8-4ea8-971d-f88d6ec8fc3e"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{THEVALUE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="49" y="0" width="18" height="20" uuid="d77bb5e4-2601-480c-a77c-ccd8255ceb29"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[%]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

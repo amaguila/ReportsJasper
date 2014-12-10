@@ -1,0 +1,229 @@
+body{
+		font: 62.5% "Trebuchet MS", sans-serif;
+		margin: 50px;
+	}
+#contenedor{
+	width: 100%;
+  	height: 100%;	
+  	/*background-color:#9FF781;*/
+  	position:absolute;
+  	top:0;
+  	left:0
+}
+#cont_izq{
+	width: 60%;
+  	height: 100%;	
+  	/*background-color:#0080FF;*/
+  	float: left;
+  	margin: 10px;
+ }
+#cont_der{
+	width: 38%;
+  	height: 100%;
+  	/*background-color:#0080FF;*/
+  	float: right;
+  	/*margin:0.50%;*/
+ }
+
+.info{
+	width: 49%;
+  	height: 3%;
+	float: left;
+	margin:0.50%;
+	/*background-image:url(images/BordeAzul.png);*/
+}
+
+#imagen{
+	width: 49%;
+  	height: 6%;
+	float: left;
+	background-image:url(images/BordeAzul.png);
+	margin:0.50%;
+}
+#company{
+	width: 49%;
+  	height: 6%;
+	float: left;
+	margin:0.50%;
+	background-image:url(images/BordeAzul.png);
+}
+
+
+#detalle{
+	width: 99%;
+  	height: 86%;
+	
+	float: left;
+	margin:0.50%;
+}
+
+#dettitulo{
+	width: 100%;
+  	height: 5%;
+	float: left;
+	background-image:url(images/BordeAzulLargo.png);
+	border-radius: 5px;
+}
+
+#detUno{
+	width: 49%;
+  	height: 52%;
+	float: left;
+	background-color:#FAFAFA;
+	border-left-style:solid;
+	border-left-width: thin;
+	border-left-color: #81BEF7;
+	border-bottom-style:solid;
+	border-bottom-width: thin;
+	border-bottom-color: #81BEF7;
+	border-radius: 5px;
+}
+
+#detDos{
+	width: 50%;
+  	height: 52%;
+	background-color:#81DAF5;
+	float: left;
+	background-color:#FAFAFA;
+	border-right-style:solid;
+	border-right-width: thin;
+	border-right-color: #81BEF7;
+	border-bottom-style:solid;
+	border-bottom-width: thin;
+	border-bottom-color: #81BEF7;
+	border-radius: 5px;
+}
+
+#titulo_Bitacora{
+	width: 100%;
+  	height: 5%;
+	float: left;
+	background-image:url(images/BordeAzulLargo.png);
+	border-radius: 5px;
+}
+
+#bitacora{
+	width: 100%;
+  	height: 37%;
+	float: left;
+
+}
+
+#titulo{
+	width: 39%;
+  	height: 11%;
+	float: left;
+	margin:0.50%;
+	
+}
+
+
+#contadorUno{
+	width: 29%;
+  	height: 11%;
+	float: left;
+	margin:0.50%;
+
+}
+
+#contadorDos{
+	width: 29%;
+  	height: 11%;
+	float: left;
+	margin:0.50%;
+
+}
+
+.contador{
+	width: 40%;
+	margin-left:30%;
+	height:90%;
+	text-align:center;
+}
+
+
+
+#graficas{
+	width: 100%;
+  	height: 48%;
+	/*background-color:orange;*/
+	float: left;
+	/*margin:0.50%;*/
+}
+
+#containerCategory{
+	width: 29%;
+  	height: 99%;
+	float: left;
+	border-style:solid;
+	border-width: thin;
+	border-color: #81BEF7;
+	border-radius: 5px;
+	margin-right: 1%;
+
+	
+}
+
+#containerPhase{
+	width: 69%;
+  	height: 99%;
+	float: left;
+	border-style:solid;
+	border-width: thin;
+	border-color: #81BEF7;
+	border-radius: 5px;
+}
+
+#titulo_Lista{
+	width: 100%;
+  	height: 5%;
+	float: left;
+	background-image:url(images/BordeAzulLargo.png);
+	border-radius: 5px;
+}
+
+#lista{
+	width: 100%;
+  	height: 34%;
+	float: left;
+	/*margin:0.50%;*/
+
+}
+
+#form_Sec {
+    margin-top: 10%;
+   
+ 
+}
+
+div label {
+  /*width: 40%;
+  float: left;*/
+  font: normal bold 11px Verdana, Arial;
+  /*margin-left: 5%;*/
+}
+
+div textarea {
+  width:90%; 
+  border: none;
+  font: normal bold 10px Verdana, Arial;
+  border: 1px solid #000;
+}
+
+input {
+	  font: normal bold 9px Verdana, Arial;
+}
+
+#pOpen {
+	cursor:pointer;
+}
+
+#pClose {
+	cursor:pointer;
+}
+
+/** Data Tables **/
+.row_selected {
+	color: black;
+	font-weight: bold; 
+}

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="test01_subreport7" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="abed396d-02d4-406a-8ce9-c8e254073166">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="operator" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+7000112 theid
+,TO_DATE(Y.FECHA,'YYYY-MM') themonth
+,Y.CODE thelevel
+,Y.PORCENTAJE thevalue
+FROM
+(
+SELECT
+TBASE.FECHA AS FECHA
+,TBASE.RESOLUTION_CODE AS CODE
+,ROUND(TBASE.TOT_GEN_CCIERRE/TDATO.TOT * 100,2) AS PORCENTAJE
+FROM
+(
+SELECT
+TO_CHAR(from_tz(cast(TUNO.DATES as timestamp),'GMT0') at time zone 'America/Mexico_City','YYYY-MM') AS FECHA
+,TUNO.RESOLUTION_CODE AS RESOLUTION_CODE
+,COUNT(*) AS TOT_GEN_CCIERRE
+FROM
+(
+SELECT
+i."NUMBER" AS IM
+,i."OPEN_TIME" AS DATES
+,UPPER(i2.RES_ANAL_CODE) AS RES_ANAL_CODE
+,UPPER (i.RESOLUTION_CODE) AS RESOLUTION_CODE
+,i.LOCATION AS LOCATION
+FROM  SM.PROBSUMMARYM1 i, SM.PROBSUMMARYM2 i2,SM.OPERATORM1 O
+WHERE
+       i."NUMBER" = i2."NUMBER"
+			AND i.RESOLUTION_CODE != 'CANCELED'
+			AND i.PROBLEM_STATUS = 'Closed'
+      AND i.closed_by = o.full_name
+      AND o.name = $P{operator}
+		     AND (  to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+           AND to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+)TUNO
+GROUP BY TO_CHAR(from_tz(cast(TUNO.DATES as timestamp),'GMT0') at time zone 'America/Mexico_City','YYYY-MM') ,TUNO.RESOLUTION_CODE
+)TBASE
+,
+(
+SELECT
+TDOS.FECHA
+,SUM(TDOS.TOT_GEN_CCIERRE) AS TOT
+FROM
+(
+SELECT
+--TO_CHAR(TUNO.DATES -6/24,'YYYY-MM') AS FECHA
+TO_CHAR(from_tz(cast(TUNO.DATES as timestamp),'GMT0') at time zone 'America/Mexico_City','YYYY-MM') AS FECHA
+,TUNO.RESOLUTION_CODE AS RESOLUTION_CODE
+,COUNT(*) AS TOT_GEN_CCIERRE
+FROM
+(
+SELECT
+i."NUMBER" AS IM
+,i."OPEN_TIME" AS DATES
+,i2.RES_ANAL_CODE AS RES_ANAL_CODE
+,UPPER(i.RESOLUTION_CODE) AS RESOLUTION_CODE
+,d.LOCATION AS LOCATION
+FROM  SM.probsummarym1 i, "SM"."DEVICE2M1" d,SM.probsummarym2 i2, SM.OPERATORM1 O
+WHERE
+          i."NUMBER" = i2."NUMBER"
+      AND i2.AFFECTED_ITEM = d.LOGICAL_NAME
+      AND i.closed_by = o.full_name
+      AND i.RESOLUTION_CODE != 'CANCELED'
+      AND i.PROBLEM_STATUS = 'Closed'
+			-- AND TO_CHAR(i."OPEN_TIME" -6/24,'YYYY-MM') = '2014-06' --TO_CHAR(SYSDATE,'YYYY-MM')
+      AND o.name = $P{operator}
+		     AND (  to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+           AND to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+      ORDER BY i."OPEN_TIME"
+)TUNO
+GROUP BY TO_CHAR(from_tz(cast(TUNO.DATES as timestamp),'GMT0') at time zone 'America/Mexico_City','YYYY-MM'),TUNO.RESOLUTION_CODE
+)TDOS
+GROUP BY TDOS.FECHA
+)TDATO
+WHERE TBASE.FECHA = TDATO.FECHA
+)Y]]>
+	</queryString>
+	<field name="THEID" class="java.math.BigDecimal"/>
+	<field name="THEMONTH" class="java.sql.Timestamp"/>
+	<field name="THELEVEL" class="java.lang.String"/>
+	<field name="THEVALUE" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="107" splitType="Stretch">
+			<pie3DChart>
+				<chart>
+					<reportElement x="0" y="0" width="204" height="107" uuid="ce697090-4c90-432c-8201-66cc578c7afd"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{THELEVEL}]]></keyExpression>
+					<valueExpression><![CDATA[$F{THEVALUE}]]></valueExpression>
+				</pieDataset>
+				<pie3DPlot labelFormat="{2}">
+					<plot/>
+					<itemLabel>
+						<font size="8"/>
+					</itemLabel>
+				</pie3DPlot>
+			</pie3DChart>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

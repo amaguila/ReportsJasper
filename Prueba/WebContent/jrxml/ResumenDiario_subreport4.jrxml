@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ResumenDiario_subreport4" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="367ae332-6386-4c1c-a7fe-07793f3b18f6">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="assignment" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT count(noti.total_com) total_incidents, (sum (noti.cumple)/ count(noti.total_com) )* 100 porc_cumple
+FROM
+(
+SELECT COUNT(*) total_com , i."NUMBER" IM, op.total_open, CASE WHEN COUNT(*) >=  (op.total_open/2) THEN 1 ELSE 0 END CUMPLE
+FROM SM.activitym1 a,SM.probsummarym1 i,
+(
+SELECT i."NUMBER",i.assignment,
+  (
+  (TO_DATE(TO_CHAR(FROM_TZ(CAST(i.close_time AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS'))      -
+  (TO_DATE(TO_CHAR(FROM_TZ(CAST(i.open_time AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS'))
+  ) *24 total_open
+FROM SM.probsummarym1 i
+WHERE i.assignment =  'INTERNATIONAL'
+  AND i.problem_status = 'Closed'
+  AND (to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS') > TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+  AND to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS') <= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+   ) op
+WHERE a."NUMBER" = i."NUMBER"
+AND i."NUMBER" = op."NUMBER"
+AND i.assignment = 'INTERNATIONAL'
+AND a.TYPE ='COMMUNICATION WITH CUSTOMER'
+GROUP BY i."NUMBER", op.total_open
+) noti]]>
+	</queryString>
+	<field name="TOTAL_INCIDENTS" class="java.math.BigDecimal"/>
+	<field name="PORC_CUMPLE" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<textField pattern="###0.00">
+				<reportElement x="1" y="1" width="34" height="17" uuid="67c47385-3b60-49a4-b5d5-264e77c7fdce"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PORC_CUMPLE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="35" y="1" width="16" height="17" uuid="53f4a262-4331-4cf9-a2e8-ac7ea24d7d77"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[%]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

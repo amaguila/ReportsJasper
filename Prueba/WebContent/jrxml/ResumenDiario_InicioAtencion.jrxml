@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ResumenDiario_InicioAtencion" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="e9cf5eb2-2566-4064-ac0e-aba8fcad77ef">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="assignment" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+        distinct T.InitialVerification value
+FROM
+(
+SELECT
+       ROUND(T_In15Min.No/T_Total.NoOpen * 100,2) as InitialVerification
+FROM
+(
+select
+      count(*) as NoOpen
+from SM.PROBSUMMARYM1 p, SM.companym1 l, SM.activitym1 ac,SM.PROBSUMMARYM2 p2,  SM.OPERATORM1 O
+
+WHERE p.COMPANY = l.company
+--AND p.assignment != 'INTERNATIONAL'
+AND p."NUMBER" = ac."NUMBER"
+AND p."NUMBER" = p2."NUMBER"
+AND ac.type = 'Open'
+--AND ac.description like '%WORK IN PROGRESS%'
+AND p.resolution_code != 'REPLACED BY MASSIVE FAILURES'
+AND p.resolution_code != 'SCHEDULED MAINTENANCE'
+AND p.resolution_code != 'CANCELED'
+AND p.domain  is null
+AND p.COMPANY != 'CNOC'
+AND p2.network_code! = 'N000011'
+AND p.closed_by = o.full_name
+AND p.assignment = $P{assignment}
+--AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD') >= '2014-08-26'--TO_CHAR(SYSDATE,'YYYY-MM')
+AND ( to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+
+
+) T_Total
+,
+(
+  SELECT
+       COUNT(*) as No
+  FROM
+  (
+    SELECT
+          ac."NUMBER" as IM_OPEN,
+          TO_DATE(TO_CHAR(FROM_TZ(CAST(ac.DATESTAMP AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') as DATESTAMP_OPEN
+          --(ac.DATESTAMP -6/24) as DATESTAMP_OPEN
+
+          FROM SM.PROBSUMMARYM1 p, SM.companym1 l, SM.activitym1 ac, SM.PROBSUMMARYM2 p2,  SM.OPERATORM1 O
+
+          WHERE p.COMPANY = l.company
+         -- AND p.assignment != 'INTERNATIONAL'
+          AND p."NUMBER" = ac."NUMBER"
+          AND p."NUMBER" = p2."NUMBER"
+          AND ac.type = 'Open'
+          AND p.resolution_code != 'SCHEDULED MAINTENANCE'
+          AND p.resolution_code != 'REPLACED BY MASSIVE FAILURES'
+          AND p.resolution_code != 'CANCELED'
+          AND p.domain  is null
+          AND p.COMPANY != 'CNOC'
+          AND p2.network_code!= 'N000011'
+          AND p.closed_by = o.full_name
+          AND p.assignment = $P{assignment}
+          --AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD') >= '2014-08-26'--TO_CHAR(SYSDATE,'YYYY-MM')
+           AND ( to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+                 AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+
+  ) T_Open
+  ,
+  (
+      SELECT
+             IM_Change,
+            -- TO_CHAR(MIN (T1.DATESTAMP_Change ) KEEP (DENSE_RANK  FIRST ORDER BY T1.DATESTAMP_Change),'YYYY-MM-DD HH24:mi') AS DATESTAMP_Change
+            MAX(T1.DATESTAMP_Change) KEEP (DENSE_RANK  FIRST ORDER BY T1.DATESTAMP_Change) AS DATESTAMP_Change
+      FROM
+      (
+        SELECT
+               ac."NUMBER" as IM_Change,
+               TO_DATE(TO_CHAR(FROM_TZ(CAST(ac.DATESTAMP AS TIMESTAMP),'GMT') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') as DATESTAMP_Change
+               --(ac.DATESTAMP -6/24) as DATESTAMP_Change
+
+        FROM SM.PROBSUMMARYM1 p, SM.companym1 l, SM.activitym1 ac, SM.PROBSUMMARYM2 p2,  SM.OPERATORM1 O
+
+        WHERE p.COMPANY = l.company
+     --   AND p.assignment != 'INTERNATIONAL'
+        AND p."NUMBER" = ac."NUMBER"
+        AND p."NUMBER" = p2."NUMBER"
+        AND OPERATOR NOT IN( 'TOOLS NETCOOL','TOOLS INTERNAL WSDL' , 'CNOC DAPPS', 'smnetcool'  )
+        AND ac.type = 'Check List'
+        AND p.resolution_code != 'REPLACED BY MASSIVE FAILURES'
+       -- AND ac.description NOT LIKE 'Reassignment from%'
+        AND ac.description LIKE '%Starting Attention with Check List'
+        AND p.closed_by = o.full_name
+        AND p.assignment = 'INTERNATIONAL'
+        AND p.resolution_code != 'SCHEDULED MAINTENANCE'
+        AND p.resolution_code != 'CANCELED'
+        AND p.COMPANY != 'CNOC'
+        AND p2.network_code != 'N000011'
+        --AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD') >= '2014-08-26'--TO_CHAR(SYSDATE,'YYYY-MM')
+        AND ( to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+                 AND to_char(from_tz(cast(p.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+
+     UNION
+     /* Query con el total de incidentes cerrados en  menos de 1 hora */
+
+     SELECT
+
+      i."NUMBER" AS IM,
+      TO_DATE(TO_CHAR(FROM_TZ(CAST(i.close_time AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD'),'YYYY-MM-DD') AS DATESTAMP
+      FROM "SM"."PROBSUMMARYM1" i,
+                    "SM"."DEVICE2M1" d,
+                    SM.DEPTM1 p,
+                    SM.DEVICE2M2 d2,
+                   SM.COMPANYM1 c,
+                    SM.OPERATORM1 O
+                 WHERE i.logical_name = d.LOGICAL_NAME
+                 AND i.problem_status = 'Closed'
+                 AND i.logical_name = d2.logical_name
+                 AND c.company = i.company
+                 AND i.closed_by = o.full_name
+                 AND i.assignment != $P{assignment}
+                 AND p.NETWORK_CODE = d2.NETWORK_CODE
+                 AND (i.RESOLUTION_CODE != 'CANCELED')
+                 AND (d2.NETWORK_CODE != 'N000003')
+                 --AND TO_CHAR(FROM_TZ(CAST(i.open_time AS TIMESTAMP),'GMT0') AT TIME ZONE 'America/Mexico_City','YYYY-MM-DD')  = '2014-08-26'
+                 AND ( to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')> TO_CHAR(SYSDATE-1, 'YYYY-MM-DD')||' 19:00:00'
+                 AND to_char(from_tz(cast(i.open_time as timestamp),'GMT') at time zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS')<= TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MM:SS') )
+                 AND
+                (
+(TO_DATE(TO_CHAR(FROM_TZ(CAST(i.close_time AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') )
+-
+(TO_DATE(TO_CHAR(FROM_TZ(CAST(i.open_time AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS'))
+)*24 <= 1
+
+      ) T1
+   GROUP BY  IM_Change
+  ) T_Change
+   WHERE T_Change.IM_Change=T_Open.IM_OPEN
+   AND  (DATESTAMP_Change-DATESTAMP_OPEN)*24*60 <= 15
+
+)T_In15Min
+)T]]>
+	</queryString>
+	<field name="VALUE" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="40" height="20" uuid="3a39b6e1-72c2-478d-9852-d4c29f598387"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{VALUE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="40" y="0" width="18" height="20" uuid="0c605951-abb8-4d32-b8be-a106d7bbacca"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[%]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

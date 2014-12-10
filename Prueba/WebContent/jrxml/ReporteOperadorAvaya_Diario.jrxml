@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteOperadorAvaya" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="13dfb207-76c5-4ab4-9e65-fa5de3e14785">
+	<property name="ireport.zoom" value="1.3310000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT s.item_name, d.logid,sum(TI_STAFFTIME) tiempo_presente,sum(I_ACDTIME) tiempo_acd,sum(I_ACWTIME) tiempo_acw,sum(I_RINGTIME) tiempo_llamado_agente,
+sum(I_ACWINTIME + I_AUXINTIME) EXT_IN_TIME, sum(TI_AVAILTIME) tiempo_dispo,sum(TI_AUXTIME) tiempo_aux ,sum(ACDCALLS + DA_ACDCALLS) llamadas_ACD,
+SYSDATE AS DATE
+ FROM dagent d, synonyms s
+WHERE d.logid = s.value
+AND row_date = '2014-09-19'
+GROUP BY s.item_name, d.logid]]>
+	</queryString>
+	<field name="item_name" class="java.lang.String"/>
+	<field name="logid" class="java.lang.String"/>
+	<field name="tiempo_presente" class="java.math.BigDecimal"/>
+	<field name="tiempo_acd" class="java.math.BigDecimal"/>
+	<field name="tiempo_acw" class="java.math.BigDecimal"/>
+	<field name="tiempo_llamado_agente" class="java.math.BigDecimal"/>
+	<field name="ext_in_time" class="java.math.BigDecimal"/>
+	<field name="tiempo_dispo" class="java.math.BigDecimal"/>
+	<field name="tiempo_aux" class="java.math.BigDecimal"/>
+	<field name="llamadas_acd" class="java.math.BigDecimal"/>
+	<field name="date" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="63" splitType="Stretch">
+			<image>
+				<reportElement x="1" y="1" width="116" height="62" uuid="809081d2-6bb3-4f12-a3a5-dc4aa82a66c6"/>
+				<imageExpression><![CDATA["D:\\ReportesKPI's\\CNOC.jpg"]]></imageExpression>
+			</image>
+			<image>
+				<reportElement x="438" y="18" width="116" height="45" uuid="e7aac6ca-a845-4fa1-bb89-1b47698b1d04"/>
+				<imageExpression><![CDATA["D:\\Jasper\\Imagenes\\Avaya.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="186" y="11" width="210" height="44" forecolor="#000099" uuid="c4b6c7ff-3a31-4e2f-97f7-67fd1cbf00bd"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="15" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPORTE ASISTENCIA DEL AGENTE]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="20" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="70" y="1" width="65" height="34" uuid="6e2787d8-78e4-4ae8-b195-0a03d26d31e4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tiempo Presente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="1" width="65" height="34" uuid="1a30e13f-6f79-42fb-8597-ecce4071635f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tiempo ACW]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="135" y="1" width="65" height="34" uuid="c22f43a0-59ea-40b8-acd6-ea5349065cdd"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tiempo ACD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="265" y="1" width="65" height="34" uuid="c1a03b26-308d-49c5-a9ac-9b7cc7650a73"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tiempo llamado Agente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="331" y="1" width="65" height="34" uuid="4f38a056-8b4f-4767-95d2-4d4a4c341d4f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tiempo de entrada a la extn]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="396" y="1" width="52" height="34" uuid="6622becc-ade4-4b50-aa1d-7b02017a3edc"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tiempo Disponible]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="448" y="1" width="52" height="34" uuid="708c8e1f-6901-4925-9a92-11eabdc92e61"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Tiempo Aux]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="500" y="1" width="54" height="34" uuid="8eac24e3-8fc5-41db-9fd3-446fc9087314"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Llamadas de ACD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="1" width="69" height="34" uuid="7836b5e4-bc9b-4e12-8d87-9cb9a53712c6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Agente]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="69" y="1" width="66" height="20" uuid="219e784b-d60c-4251-9bc3-d3ab01c1d5aa"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tiempo_presente}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="266" y="1" width="64" height="20" uuid="f290fcaa-eb70-4927-9920-49a318be738a"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tiempo_llamado_agente}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="331" y="1" width="65" height="20" uuid="12336641-3ab2-4a2e-93a9-b68df004c5b5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ext_in_time}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="396" y="1" width="52" height="20" uuid="0201c415-bc4f-4c4b-9e57-9b45d722718e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tiempo_dispo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="448" y="1" width="52" height="20" uuid="4929ebdf-95d0-4269-9779-9ddaaccd3d0c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tiempo_aux}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="500" y="1" width="54" height="20" uuid="19d3a217-0433-4968-89f5-688c7b760e93"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{llamadas_acd}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="1" width="69" height="20" uuid="23e6021e-4b37-498d-bcf7-6d5184af0639"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{item_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="135" y="1" width="65" height="20" uuid="177c92aa-d9e6-43dc-bf9f-36c610c810b0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tiempo_acd}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="1" width="65" height="20" uuid="32a40f10-c121-4ef0-a8d0-5cc2fbce9207"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tiempo_acw}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="11" splitType="Stretch"/>
+	</summary>
+</jasperReport>

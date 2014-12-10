@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteKPIsSupervisores_subreport7" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="266cedf4-6813-4063-85aa-d642fa08765d">
+	<property name="ireport.zoom" value="1.464100000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="sector" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\ReportesKPI's\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+i."NUMBER" AS IM,
+TO_CHAR(FROM_TZ(CAST(i.open_time AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS') as open_time,i2.sector,
+TO_CHAR(FROM_TZ(CAST(i.close_time AS TIMESTAMP),'GMT0') at TIME zone 'America/Mexico_City','YYYY-MM-DD HH24:MM:SS') as close_time,CASE
+            WHEN (i.SEVERITY = 1) THEN 'SI'
+            WHEN (i.SEVERITY = 2) THEN 'NO'
+            WHEN (i.SEVERITY = 3) THEN 'NO'
+            ELSE ' '
+            END "AFECTA_DISP"
+,
+i.problem_status,i.company
+FROM "SM"."PROBSUMMARYM1" i,
+     "SM"."PROBSUMMARYM2" i2,
+     "SM"."DEVICE2M1" d3,
+      SM.bizservicem1 b,
+      SM.LOCM1 l
+WHERE
+i2.affected_item = b.logical_name
+AND i."NUMBER" = i2."NUMBER"
+AND b.logical_name = d3.logical_name
+AND d3.location_code = l.location_code
+--AND ( d3.problem_priority = '1' OR l.node_type = 'CORPORATE SITE')
+AND i.severity = 1
+AND (i.RESOLUTION_CODE != 'CANCELED')
+AND (i2.NETWORK_CODE != 'N000003')
+AND TO_CHAR(FROM_TZ(CAST(i.open_time AS TIMESTAMP),'GMT0') at TIME ZONE 'America/Mexico_City','YYYY-MM')  = TO_CHAR(SYSDATE,'YYYY-MM')
+AND i.assignment = $P{sector}
+ORDER BY i.company, i.open_time, i.problem_status]]>
+	</queryString>
+	<field name="IM" class="java.lang.String"/>
+	<field name="OPEN_TIME" class="java.lang.String"/>
+	<field name="SECTOR" class="java.lang.String"/>
+	<field name="CLOSE_TIME" class="java.lang.String"/>
+	<field name="AFECTA_DISP" class="java.lang.String"/>
+	<field name="PROBLEM_STATUS" class="java.lang.String"/>
+	<field name="COMPANY" class="java.lang.String"/>
+	<group name="company">
+		<groupExpression><![CDATA[$F{COMPANY}]]></groupExpression>
+		<groupHeader>
+			<band height="12">
+				<textField>
+					<reportElement mode="Opaque" x="0" y="0" width="264" height="12" forecolor="#000000" backcolor="#CCCCCC" uuid="a1520d45-dc59-4635-a9d8-45bb67e29dff"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="6" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{COMPANY}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="22" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="153" y="0" width="46" height="22" forecolor="#FFFFFF" backcolor="#003366" uuid="04fb19f7-be77-4e63-8e09-4c5d22d40d79"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Close Time]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="106" y="0" width="47" height="22" forecolor="#FFFFFF" backcolor="#003366" uuid="618c0fc8-8bc0-4ab6-9fca-5c23136155c4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Open Time]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="56" y="0" width="50" height="22" forecolor="#FFFFFF" backcolor="#003366" uuid="38c7db5b-2860-40f0-b739-e675f1cb632b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="56" height="22" forecolor="#FFFFFF" backcolor="#003366" uuid="25dff714-9ffb-47f2-8443-c891ebba0e56"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[IM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="199" y="0" width="65" height="22" forecolor="#FFFFFF" backcolor="#003366" uuid="bf49c153-38e0-41f4-92b1-4efb2a216776"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Status Change]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="13" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="106" y="0" width="47" height="13" uuid="965a8906-264b-467f-b49e-c1cf37d1a36a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OPEN_TIME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="153" y="0" width="46" height="13" uuid="42ad9f04-5976-4928-9abd-11cbe12e3c5e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CLOSE_TIME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="56" height="13" uuid="3770723e-b8b0-4ede-9888-d4d1e80457a0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{IM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="56" y="0" width="50" height="13" uuid="bc81d7c1-a7bd-4e08-87ce-19325358ad05"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PROBLEM_STATUS}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="199" y="0" width="65" height="13" uuid="bb50ee38-5c35-494e-b0fe-f7d2d6407c86"/>
+				<subreportParameter name="IM">
+					<subreportParameterExpression><![CDATA[$F{IM}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReporteKPIsSupervisores_status_change.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
